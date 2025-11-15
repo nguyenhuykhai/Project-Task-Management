@@ -1,8 +1,6 @@
-# Sprint Task Dashboard
+# Project Task Management
 
-Real‑time sprint & task board – **Next.js 14 (app router) + Bun + Firebase + Google Auth + CSV import**.
-
-![Preview](https://via.placeholder.com/1200x600.png?text=Sprint+Dashboard)
+Real‑time sprint & task board – **Next.js 16 (app router) + Bun + Firebase + Google Auth + CSV import**.
 
 ---
 
@@ -10,7 +8,7 @@ Real‑time sprint & task board – **Next.js 14 (app router) + Bun + Firebase +
 
 - **Google Sign‑In** (no passwords)
 - **Real‑time sync** across devices
-- **CSV bulk import** – up to **6 owners per task**
+- **CSV bulk import**
 - Responsive charts & smart table
 - Dark mode ready
 
@@ -19,9 +17,9 @@ Real‑time sprint & task board – **Next.js 14 (app router) + Bun + Firebase +
 ## Quick Start
 
 ```bash
-git clone https://github.com/<you>/sprint-task-dashboard.git
-cd sprint-task-dashboard
+git clone https://github.com/nguyenhuykhai/Project-Task-Management.git
+cd Project-Task-Management
 bun install
-cp .env.example .env.local   # ← fill Firebase values
+cp .env.example .env.local
 bun dev
 ```
