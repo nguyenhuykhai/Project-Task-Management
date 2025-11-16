@@ -1,17 +1,16 @@
-import React from "react";
-import type { Task } from "../types";
-import { useChartData } from "../hooks/useChartData";
-import WIPBarChart from "./charts/WIPBarChart";
-import StatusDoughnutChart from "./charts/StatusDoughnutChart";
-import SprintLineChart from "./charts/SprintLineChart";
-import MonthlyLineChart from "./charts/MonthlyLineChart";
+import React from 'react';
+import type { Task } from '../types';
+import { useChartData } from '../hooks/useChartData';
+import WIPBarChart from './charts/WIPBarChart';
+import StatusDoughnutChart from './charts/StatusDoughnutChart';
+import SprintLineChart from './charts/SprintLineChart';
+import MonthlyLineChart from './charts/MonthlyLineChart';
 
-// Reusable Chart Card
 const ChartCard: React.FC<{
   title: string;
   children: React.ReactNode;
   className?: string;
-}> = ({ title, children, className = "" }) => (
+}> = ({ title, children, className = '' }) => (
   <div
     className={`
       bg-card border border-border rounded-xl shadow-sm
@@ -20,9 +19,7 @@ const ChartCard: React.FC<{
       ${className}
     `}
   >
-    <h3 className="text-lg font-semibold text-foreground mb-4 tracking-tight">
-      {title}
-    </h3>
+    <h3 className="text-lg font-semibold text-foreground mb-4 tracking-tight">{title}</h3>
     <div className="flex-1 min-h-0">{children}</div>
   </div>
 );
@@ -31,14 +28,10 @@ const ChartCard: React.FC<{
 const KPICard: React.FC<{
   title: string;
   value: string | number;
-  trend?: "up" | "down" | "neutral";
-}> = ({ title, value, trend = "neutral" }) => {
+  trend?: 'up' | 'down' | 'neutral';
+}> = ({ title, value, trend = 'neutral' }) => {
   const trendColor =
-    trend === "up"
-      ? "text-green-500"
-      : trend === "down"
-      ? "text-red-500"
-      : "text-muted-foreground";
+    trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
 
   return (
     <div
@@ -54,15 +47,13 @@ const KPICard: React.FC<{
       {/* Subtle glow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-        {title}
-      </p>
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{title}</p>
       <p className="text-4xl font-bold mt-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
         {value}
       </p>
-      {trend !== "neutral" && (
+      {trend !== 'neutral' && (
         <p className={`text-xs mt-1 flex items-center gap-1 ${trendColor}`}>
-          {trend === "up" ? "↑" : "↓"} Trending
+          {trend === 'up' ? '↑' : '↓'} Trending
         </p>
       )}
     </div>
@@ -70,13 +61,8 @@ const KPICard: React.FC<{
 };
 
 const Dashboard: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
-  const {
-    memberWipAverage,
-    teamWipAverage,
-    statusDistribution,
-    sprintProgress,
-    monthlyProgress,
-  } = useChartData(tasks);
+  const { memberWipAverage, teamWipAverage, statusDistribution, sprintProgress, monthlyProgress } =
+    useChartData(tasks);
 
   return (
     <div className="space-y-6">
@@ -87,13 +73,7 @@ const Dashboard: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
           <KPICard
             title="Team WIP Average"
             value={teamWipAverage.toFixed(1)}
-            trend={
-              teamWipAverage > 3
-                ? "down"
-                : teamWipAverage < 2
-                ? "up"
-                : "neutral"
-            }
+            trend={teamWipAverage > 3 ? 'down' : teamWipAverage < 2 ? 'up' : 'neutral'}
           />
           <ChartCard title="Points by Status">
             <StatusDoughnutChart data={statusDistribution} />
@@ -108,7 +88,7 @@ const Dashboard: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
         </ChartCard>
 
         {/* Placeholder for future card */}
-        <ChartCard title="Member WIP Average (from 'Done' tasks)">
+        <ChartCard title="Member WIP Average (from 'Completed' tasks)">
           <WIPBarChart data={memberWipAverage} />
         </ChartCard>
       </div>

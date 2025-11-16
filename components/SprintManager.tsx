@@ -1,27 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useTaskStore } from "../store/taskStore";
-import type { Sprint } from "../types";
-import { Edit, Trash2, Plus, Upload } from "lucide-react";
-import SprintFormModal from "./SprintFormModal";
-import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
-import ImportCSVModal from "./ImportCSVModal";
+import React, { useState } from 'react';
+import { useTaskStore } from '../store/taskStore';
+import type { Sprint } from '../types';
+import { Edit, Trash2, Plus, Upload } from 'lucide-react';
+import SprintFormModal from './SprintFormModal';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import ImportCSVModal from './ImportCSVModal';
 
 const SprintManager: React.FC = () => {
   const sprints = useTaskStore((state) => state.sprints);
@@ -42,7 +29,7 @@ const SprintManager: React.FC = () => {
   };
 
   const sortedSprints = [...sprints].sort(
-    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    (a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime(),
   );
 
   return (
@@ -51,19 +38,13 @@ const SprintManager: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div>
             <CardTitle className="text-2xl">Manage Sprints</CardTitle>
-            <CardDescription>
-              Create and manage your project sprints
-            </CardDescription>
+            <CardDescription>Create and manage your project sprints</CardDescription>
           </div>
           <Button onClick={() => handleOpenModal()}>
             <Plus size={20} />
             <span className="hidden sm:inline">Add Sprint</span>
           </Button>
-          <Button
-            onClick={() => setImportOpen(true)}
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={() => setImportOpen(true)} variant="outline" size="sm">
             <Upload size={16} className="mr-2" />
             Import CSV
           </Button>
@@ -73,21 +54,18 @@ const SprintManager: React.FC = () => {
             size="sm"
             onClick={() => {
               const csv = `Task,Link,Total Point,Label,Priority,Status,Percent,Notes,Owner 1,Point 1,Owner 2,Point 2,Owner 3,Point 3,Owner 4,Point 4,Owner 5,Point 5,Owner 6,Point 6\nNew Task,https://github.com/...,5,MUST HAVE,High,To Do,0%,,Alice,3,Bob,2,,,`;
-              const blob = new Blob([csv], { type: "text/csv" });
+              const blob = new Blob([csv], { type: 'text/csv' });
               const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
+              const a = document.createElement('a');
               a.href = url;
-              a.download = "task-template.csv";
+              a.download = 'task-template.csv';
               a.click();
             }}
           >
             Download Template
           </Button>
 
-          <ImportCSVModal
-            isOpen={importOpen}
-            onClose={() => setImportOpen(false)}
-          />
+          <ImportCSVModal isOpen={importOpen} onClose={() => setImportOpen(false)} />
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -104,11 +82,9 @@ const SprintManager: React.FC = () => {
                 {sortedSprints.length > 0 ? (
                   sortedSprints.map((sprint) => (
                     <TableRow key={sprint.id}>
-                      <TableCell className="font-medium">
-                        {sprint.name}
-                      </TableCell>
-                      <TableCell>{sprint.startDate}</TableCell>
-                      <TableCell>{sprint.endDate}</TableCell>
+                      <TableCell className="font-medium">{sprint.name}</TableCell>
+                      <TableCell>{sprint.start_date}</TableCell>
+                      <TableCell>{sprint.end_date}</TableCell>
                       <TableCell className="text-right flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
@@ -123,7 +99,7 @@ const SprintManager: React.FC = () => {
                           size="icon"
                           onClick={() =>
                             window.confirm(
-                              "Are you sure? This will also delete all tasks in this sprint."
+                              'Are you sure? This will also delete all tasks in this sprint.',
                             ) && deleteSprint(sprint.id)
                           }
                           className="h-8 w-8 hover:text-destructive"
@@ -135,10 +111,7 @@ const SprintManager: React.FC = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center py-8 text-muted-foreground"
-                    >
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                       No sprints yet. Create one to get started!
                     </TableCell>
                   </TableRow>
@@ -150,11 +123,7 @@ const SprintManager: React.FC = () => {
       </Card>
 
       {isModalOpen && (
-        <SprintFormModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          sprint={editingSprint}
-        />
+        <SprintFormModal isOpen={isModalOpen} onClose={handleCloseModal} sprint={editingSprint} />
       )}
     </div>
   );

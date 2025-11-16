@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
-import { Button } from "@/components/ui/button";
-import { Loader2, LogOut } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Loader2, LogOut } from 'lucide-react';
+import type { User } from '@supabase/supabase-js';
 
 interface GoogleAuthProps {
   onAuthSuccess: () => void;
@@ -12,23 +12,76 @@ interface GoogleAuthProps {
 
 export default function GoogleAuth({ onAuthSuccess }: GoogleAuthProps) {
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  // Listen to auth changes (login / logout)
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      if (u) onAuthSuccess();
+    // Check active sessions
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) onAuthSuccess();
     });
-    return unsub;
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) onAuthSuccess();
+    });
+
+    return () => subscription.unsubscribe();
   }, [onAuthSuccess]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) throw error;
     } catch (err: any) {
-      alert("Google login failed: " + err.message);
+      console.error('Google login error:', err);
+      alert(
+        'Google login failed: ' +
+          err.message +
+          '\n\nPlease enable Google OAuth in Supabase Dashboard:\nAuthentication → Providers → Google',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Temporary: Email/Password login as fallback
+  const handleEmailLogin = async () => {
+    const email = prompt('Enter email:');
+    const password = prompt('Enter password:');
+
+    if (!email || !password) return;
+
+    setLoading(true);
+    try {
+      // Try to sign in first
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      // If user doesn't exist, sign them up
+      if (error?.message.includes('Invalid login credentials')) {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) throw signUpError;
+        alert('Account created! Please check your email to verify.');
+      } else if (error) {
+        throw error;
+      }
+    } catch (err: any) {
+      alert('Email login failed: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -37,7 +90,7 @@ export default function GoogleAuth({ onAuthSuccess }: GoogleAuthProps) {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
     } finally {
       setLoading(false);
     }
@@ -47,25 +100,16 @@ export default function GoogleAuth({ onAuthSuccess }: GoogleAuthProps) {
     return (
       <div className="flex items-center gap-3 p-4 bg-card rounded-lg shadow-sm">
         <img
-          src={user.photoURL ?? undefined}
-          alt={user.displayName ?? "User"}
+          src={user.user_metadata?.avatar_url ?? undefined}
+          alt={user.user_metadata?.full_name ?? 'User'}
           className="w-10 h-10 rounded-full"
         />
         <div className="flex-1">
-          <p className="font-medium">{user.displayName}</p>
+          <p className="font-medium">{user.user_metadata?.full_name}</p>
           <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleLogout}
-          disabled={loading}
-        >
-          {loading ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <LogOut size={18} />
-          )}
+        <Button variant="ghost" size="icon" onClick={handleLogout} disabled={loading}>
+          {loading ? <Loader2 className="animate-spin" /> : <LogOut size={18} />}
         </Button>
       </div>
     );

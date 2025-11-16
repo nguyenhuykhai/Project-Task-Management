@@ -1,108 +1,41 @@
-"use client";
+'use client';
 
-import { Plus } from "lucide-react";
-import { onSnapshot, doc } from "firebase/firestore";
-import { db, auth } from "./lib/firebase";
-import React, { useEffect, useMemo, useState } from "react";
-import Dashboard from "./components/Dashboard";
-import GoogleAuth from "./components/GoogleAuth";
-import Header from "./components/Header";
-import SprintManager from "./components/SprintManager";
-import TaskFormModal from "./components/TaskFormModal";
-import TaskTable from "./components/TaskTable";
-import AdBlockerModal from "./components/AdBlockerModal"; // ← NEW
-import { Button } from "./components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { useTaskStore } from "./store/taskStore";
-import type { Task } from "./types";
+import { Plus } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import Dashboard from './components/Dashboard';
+import GoogleAuth from './components/GoogleAuth';
+import Header from './components/Header';
+import SprintManager from './components/SprintManager';
+import TaskFormModal from './components/TaskFormModal';
+import TaskTable from './components/TaskTable';
+import { Button } from './components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+import { useTaskStore } from './store/taskStore';
+import type { Task } from './types';
 
-type View = "dashboard" | "sprints";
+type View = 'dashboard' | 'sprints';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adBlockOpen, setAdBlockOpen] = useState(false);
+  // Global variables
+  const { tasks, sprints, filterValue } = useTaskStore();
 
+  // Local variables
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [view, setView] = useState<View>('dashboard');
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       return (
-        localStorage.getItem("theme") === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
+        localStorage.getItem('theme') === 'dark' ||
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
       );
     }
     return false;
   });
 
-  const [view, setView] = useState<View>("dashboard");
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-
-  const { tasks, sprints, filterValue } = useTaskStore();
-
-  // === Ad-blocker Detection ===
-  const [isListenerBlocked, setIsListenerBlocked] = useState(false);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
-
-    // Try to set up a dummy listener to detect blocking
-    let timeout: NodeJS.Timeout;
-    const testCol = `users/${userId}/_healthcheck`;
-
-    const unsub = onSnapshot(
-      doc(db, testCol, "check"),
-      () => {},
-      (err: any) => {
-        const msg = err?.message?.toLowerCase() || "";
-        if (
-          msg.includes("blocked") ||
-          msg.includes("aborted") ||
-          err?.code === "unavailable"
-        ) {
-          setIsListenerBlocked(true);
-        }
-      }
-    );
-
-    // Fallback: if no error in 5s, assume OK
-    timeout = setTimeout(() => {
-      setIsListenerBlocked(false);
-    }, 5000);
-
-    return () => {
-      clearTimeout(timeout);
-      unsub?.();
-    };
-  }, [isAuthenticated]);
-
-  // Show modal when blocked
-  useEffect(() => {
-    if (isListenerBlocked) {
-      setAdBlockOpen(true);
-    }
-  }, [isListenerBlocked]);
-
-  // === Dark Mode ===
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDarkMode]);
-
+  // Functions
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   const handleOpenTaskModal = (task: Task | null = null) => {
@@ -116,31 +49,34 @@ const App: React.FC = () => {
   };
 
   const filteredTasks = useMemo(() => {
-    if (filterValue === "all_time") return tasks;
+    if (filterValue === 'all_time') return tasks;
 
-    if (filterValue === "current_sprint") {
-      const today = new Date().toISOString().split("T")[0];
-      const currentSprint = sprints.find(
-        (s) => s.startDate <= today && s.endDate >= today
-      );
-      return currentSprint
-        ? tasks.filter((t) => t.sprintId === currentSprint.id)
-        : [];
+    if (filterValue === 'current_sprint') {
+      const today = new Date().toISOString().split('T')[0];
+      const currentSprint = sprints.find((s) => s.start_date <= today && s.end_date >= today);
+      return currentSprint ? tasks.filter((t) => t.sprint_id === currentSprint.id) : [];
     }
 
     if (sprints.some((s) => s.id === filterValue)) {
-      return tasks.filter((t) => t.sprintId === filterValue);
+      return tasks.filter((t) => t.sprint_id === filterValue);
     }
 
     const sprintIdsForMonth = sprints
-      .filter(
-        (s) =>
-          s.startDate.startsWith(filterValue) ||
-          s.endDate.startsWith(filterValue)
-      )
-      .map((s) => s.id);
-    return tasks.filter((t) => sprintIdsForMonth.includes(t.sprintId));
+      .filter((s) => s?.start_date?.startsWith(filterValue) || s?.end_date?.startsWith(filterValue))
+      .map((s) => s?.id);
+    return tasks.filter((t) => sprintIdsForMonth?.includes(t.sprint_id));
   }, [tasks, sprints, filterValue]);
+
+  // Effects
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   if (!isAuthenticated) {
     return <GoogleAuth onAuthSuccess={() => setIsAuthenticated(true)} />;
@@ -154,11 +90,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Tabs
-            value={view}
-            onValueChange={(v) => setView(v as View)}
-            className="w-full"
-          >
+          <Tabs value={view} onValueChange={(v) => setView(v as View)} className="w-full">
             <TabsList className="grid w-full max-w-xs grid-cols-2 mb-8">
               <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
               <TabsTrigger value="sprints">Sprints</TabsTrigger>
@@ -185,10 +117,7 @@ const App: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   {sprints.length > 0 ? (
-                    <TaskTable
-                      tasks={filteredTasks}
-                      onEdit={handleOpenTaskModal}
-                    />
+                    <TaskTable tasks={filteredTasks} onEdit={handleOpenTaskModal} />
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <p className="text-base">No sprints found.</p>
@@ -208,20 +137,9 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Task Modal */}
       {isTaskModalOpen && (
-        <TaskFormModal
-          isOpen={isTaskModalOpen}
-          onClose={handleCloseTaskModal}
-          task={editingTask}
-        />
+        <TaskFormModal isOpen={isTaskModalOpen} onClose={handleCloseTaskModal} task={editingTask} />
       )}
-
-      {/* Ad-blocker Modal */}
-      <AdBlockerModal
-        open={adBlockOpen}
-        onClose={() => setAdBlockOpen(false)}
-      />
     </div>
   );
 };

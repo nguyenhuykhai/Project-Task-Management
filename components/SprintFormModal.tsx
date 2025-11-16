@@ -22,30 +22,39 @@ interface SprintFormModalProps {
   sprint: Sprint | null;
 }
 
-const SprintFormModal: React.FC<SprintFormModalProps> = ({
-  isOpen,
-  onClose,
-  sprint,
-}) => {
+const SprintFormModal: React.FC<SprintFormModalProps> = ({ isOpen, onClose, sprint }) => {
   const addSprint = useTaskStore((state) => state.addSprint);
   const updateSprint = useTaskStore((state) => state.updateSprint);
 
   const [formData, setFormData] = useState({
+    user_id: '',
     name: '',
-    startDate: '',
-    endDate: '',
+    start_date: '',
+    end_date: '',
+    created_at: '',
+    updated_at: '',
   });
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (sprint) {
       setFormData({
+        user_id: sprint.user_id,
         name: sprint.name,
-        startDate: sprint.startDate,
-        endDate: sprint.endDate,
+        start_date: sprint.start_date,
+        end_date: sprint.end_date,
+        created_at: sprint.created_at,
+        updated_at: sprint.updated_at,
       });
     } else {
-      setFormData({ name: '', startDate: '', endDate: '' });
+      setFormData({
+        user_id: '',
+        name: '',
+        start_date: '',
+        end_date: '',
+        created_at: '',
+        updated_at: '',
+      });
     }
   }, [sprint, isOpen]);
 
@@ -56,7 +65,7 @@ const SprintFormModal: React.FC<SprintFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (formData.endDate < formData.startDate) {
+    if (formData.end_date < formData.start_date) {
       setError('End date cannot be before start date.');
       return;
     }
@@ -73,13 +82,9 @@ const SprintFormModal: React.FC<SprintFormModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {sprint ? 'Edit Sprint' : 'Add New Sprint'}
-          </DialogTitle>
+          <DialogTitle>{sprint ? 'Edit Sprint' : 'Add New Sprint'}</DialogTitle>
           <DialogDescription>
-            {sprint
-              ? 'Update the sprint details.'
-              : 'Create a new sprint for your team.'}
+            {sprint ? 'Update the sprint details.' : 'Create a new sprint for your team.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -106,8 +111,8 @@ const SprintFormModal: React.FC<SprintFormModalProps> = ({
               <Input
                 id="start-date"
                 type="date"
-                name="startDate"
-                value={formData.startDate}
+                name="start_date"
+                value={formData.start_date}
                 onChange={handleChange}
                 required
               />
@@ -119,8 +124,8 @@ const SprintFormModal: React.FC<SprintFormModalProps> = ({
               <Input
                 id="end-date"
                 type="date"
-                name="endDate"
-                value={formData.endDate}
+                name="end_date"
+                value={formData.end_date}
                 onChange={handleChange}
                 required
               />
@@ -137,9 +142,7 @@ const SprintFormModal: React.FC<SprintFormModalProps> = ({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
-              {sprint ? 'Update Sprint' : 'Create Sprint'}
-            </Button>
+            <Button type="submit">{sprint ? 'Update Sprint' : 'Create Sprint'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

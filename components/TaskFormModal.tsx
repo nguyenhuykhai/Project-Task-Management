@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useTaskStore } from '../store/taskStore';
-import type { Task, Owner, Sprint } from '../types';
+import { TASK_LABEL, TASK_PRIORITY, TASK_STATUS } from '@/constants';
 import { Plus, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useTaskStore } from '../store/taskStore';
+import type { Owner, Sprint, Task } from '../types';
+import { Alert, AlertDescription } from './ui/alert';
+import { Button } from './ui/button';
 import {
   Dialog,
   DialogContent,
@@ -12,18 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from './ui/dialog';
-import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
-import { Alert, AlertDescription } from './ui/alert';
-import { Textarea } from './ui/textarea';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -34,28 +27,25 @@ interface TaskFormModalProps {
 const getInitialFormData = (sprints: Sprint[]): Omit<Task, 'id'> => ({
   task: '',
   link: '',
-  totalPoint: 0,
-  label: 'MUST HAVE',
-  priority: 'Medium',
-  status: 'To Do',
+  total_point: 0,
+  label: TASK_LABEL.MUST_HAVE,
+  priority: TASK_PRIORITY.MEDIUM,
+  status: TASK_STATUS.TODO,
   percent: '0%',
   notes: '',
   owners: [{ name: '', point: 0 }],
-  sprintId: sprints[0]?.id || '',
+  sprint_id: sprints[0]?.id || '',
+  user_id: '',
+  created_at: '',
+  updated_at: '',
 });
 
-const TaskFormModal: React.FC<TaskFormModalProps> = ({
-  isOpen,
-  onClose,
-  task,
-}) => {
+const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, task }) => {
   const sprints = useTaskStore((state) => state.sprints);
   const addTask = useTaskStore((state) => state.addTask);
   const updateTask = useTaskStore((state) => state.updateTask);
 
-  const [formData, setFormData] = useState<Omit<Task, 'id'>>(() =>
-    getInitialFormData(sprints)
-  );
+  const [formData, setFormData] = useState<Omit<Task, 'id'>>(() => getInitialFormData(sprints));
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -69,9 +59,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
   }, [task, isOpen, sprints]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -80,11 +68,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
     }));
   };
 
-  const handleOwnerChange = (
-    index: number,
-    field: keyof Owner,
-    value: string
-  ) => {
+  const handleOwnerChange = (index: number, field: keyof Owner, value: string) => {
     const newOwners = [...formData.owners];
     if (field === 'point') {
       newOwners[index] = {
@@ -115,18 +99,15 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.sprintId) {
+    if (!formData.sprint_id) {
       setError('A sprint must be selected.');
       return;
     }
 
-    const ownerPointsSum = formData.owners.reduce(
-      (sum, owner) => sum + owner.point,
-      0
-    );
-    if (formData.totalPoint !== ownerPointsSum) {
+    const ownerPointsSum = formData.owners.reduce((sum, owner) => sum + owner.point, 0);
+    if (formData.total_point !== ownerPointsSum) {
       setError(
-        `Total Point (${formData.totalPoint}) must equal the sum of owner points (${ownerPointsSum}).`
+        `Total Point (${formData.total_point}) must equal the sum of owner points (${ownerPointsSum}).`,
       );
       return;
     }
@@ -144,13 +125,9 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {task ? 'Edit Task' : 'Add New Task'}
-          </DialogTitle>
+          <DialogTitle>{task ? 'Edit Task' : 'Add New Task'}</DialogTitle>
           <DialogDescription>
-            {task
-              ? 'Update the task details.'
-              : 'Create a new task for your sprint.'}
+            {task ? 'Update the task details.' : 'Create a new task for your sprint.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -162,8 +139,8 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
               </Label>
               <select
                 id="sprint"
-                name="sprintId"
-                value={formData.sprintId}
+                name="sprint_id"
+                value={formData.sprint_id}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -207,8 +184,8 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 id="totalPoint"
                 type="number"
                 step="0.1"
-                name="totalPoint"
-                value={formData.totalPoint}
+                name="total_point"
+                value={formData.total_point}
                 onChange={handleChange}
                 required
               />
@@ -222,9 +199,9 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                <option>To Do</option>
+                <option>To do</option>
                 <option>In progress</option>
-                <option>Done</option>
+                <option>Completed</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -263,29 +240,29 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
             {formData.owners.map((owner, index) => (
               <div key={index} className="flex items-end gap-2">
                 <div className="flex-1 space-y-1">
-                  <Label htmlFor={`owner-name-${index}`} className="text-xs">Name</Label>
+                  <Label htmlFor={`owner-name-${index}`} className="text-xs">
+                    Name
+                  </Label>
                   <Input
                     id={`owner-name-${index}`}
                     type="text"
                     placeholder="Owner name"
                     value={owner.name}
-                    onChange={(e) =>
-                      handleOwnerChange(index, 'name', e.target.value)
-                    }
+                    onChange={(e) => handleOwnerChange(index, 'name', e.target.value)}
                     required
                   />
                 </div>
                 <div className="flex-1 space-y-1">
-                  <Label htmlFor={`owner-point-${index}`} className="text-xs">Points</Label>
+                  <Label htmlFor={`owner-point-${index}`} className="text-xs">
+                    Points
+                  </Label>
                   <Input
                     id={`owner-point-${index}`}
                     type="number"
                     step="0.1"
                     placeholder="0"
                     value={owner.point}
-                    onChange={(e) =>
-                      handleOwnerChange(index, 'point', e.target.value)
-                    }
+                    onChange={(e) => handleOwnerChange(index, 'point', e.target.value)}
                     required
                   />
                 </div>
@@ -323,9 +300,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
-              {task ? 'Update Task' : 'Create Task'}
-            </Button>
+            <Button type="submit">{task ? 'Update Task' : 'Create Task'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
