@@ -78,7 +78,6 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) => {
           onChange={(e) => handleFilterChange(e.target.value)}
           className="flex-1 md:flex-initial px-3 py-2 rounded-lg bg-background border border-input text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ring"
         >
-          <option value="current_sprint">Current Sprint</option>
           <option value="all_time">All Time</option>
           {sprints.length > 0 && (
             <>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import Dashboard from './components/Dashboard';
 import GoogleAuth from './components/GoogleAuth';
@@ -14,6 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { useAuthStore } from './store/authStore';
 import { useTaskStore } from './store/taskStore';
 import type { Task } from './types';
+import { Input } from './components/ui/input';
+import { debounce } from 'lodash';
+import { PAGE_SIZE } from './lib/api';
 
 type View = 'dashboard' | 'sprints';
 
@@ -22,13 +25,27 @@ const App: React.FC = () => {
   const { isAuthenticated, initializeAuth } = useAuthStore();
 
   // Task store
-  const { tasks, sprints, filterValue, loadTasks, loadSprints, setupRealtimeSubscriptions } =
-    useTaskStore();
+  const {
+    tasks,
+    sprints,
+    filterValue,
+    loadTasks,
+    loadSprints,
+    setupRealtimeSubscriptions,
+    setSearchQuery,
+    searchQuery,
+    isLoading,
+    totalCount,
+    setCurrentPage,
+    totalPages,
+    currentPage,
+  } = useTaskStore();
 
   // Local variables
   const [view, setView] = useState<View>('dashboard');
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [searchValue, setSearchValue] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return (
@@ -55,12 +72,6 @@ const App: React.FC = () => {
   const filteredTasks = useMemo(() => {
     if (filterValue === 'all_time') return tasks;
 
-    if (filterValue === 'current_sprint') {
-      const today = new Date().toISOString().split('T')[0];
-      const currentSprint = sprints.find((s) => s.start_date <= today && s.end_date >= today);
-      return currentSprint ? tasks.filter((t) => t.sprint_id === currentSprint.id) : [];
-    }
-
     if (sprints.some((s) => s.id === filterValue)) {
       return tasks.filter((t) => t.sprint_id === filterValue);
     }
@@ -72,6 +83,12 @@ const App: React.FC = () => {
   }, [tasks, sprints, filterValue]);
 
   // Effects
+  useEffect(() => {
+    const debouncedSearch = debounce(() => setSearchQuery(searchValue), 300);
+    debouncedSearch();
+    return () => debouncedSearch.cancel();
+  }, [searchValue]);
+
   // Initialize auth on mount
   useEffect(() => {
     initializeAuth();
@@ -135,8 +152,77 @@ const App: React.FC = () => {
                   </Button>
                 </CardHeader>
                 <CardContent>
+                  {/* Search */}
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex-1 max-w-md">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search tasks, owners, labels..."
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {isLoading
+                        ? 'Loading...'
+                        : `${totalCount} task${totalCount !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
+
                   {sprints.length > 0 ? (
-                    <TaskTable tasks={filteredTasks} onEdit={handleOpenTaskModal} />
+                    <>
+                      <TaskTable tasks={filteredTasks} onEdit={handleOpenTaskModal} />
+                      {/* Pagination Controls */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-muted-foreground">
+                            Showing {(currentPage - 1) * PAGE_SIZE + 1} to{' '}
+                            {Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount} tasks
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setCurrentPage(1)}
+                              disabled={currentPage === 1}
+                            >
+                              <ChevronsLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                              disabled={currentPage === 1}
+                            >
+                              <ChevronLeft className="h-4 w-4" />
+                            </Button>
+
+                            <span className="px-4 text-sm">
+                              Page {currentPage} of {totalPages}
+                            </span>
+
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setCurrentPage(totalPages)}
+                              disabled={currentPage === totalPages}
+                            >
+                              <ChevronsRight className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <p className="text-base">No sprints found.</p>

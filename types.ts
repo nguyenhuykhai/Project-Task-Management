@@ -1,4 +1,5 @@
 import { TASK_LABEL, TASK_PRIORITY, TASK_STATUS } from './constants';
+import { FetchTasksParams } from './lib/api';
 
 export interface Owner {
   name: string;
@@ -50,20 +51,29 @@ export interface TaskWithSprint extends Task {
   sprint?: Sprint;
 }
 
-export type FilterValue = 'current_sprint' | 'all_time' | string;
+export type FilterValue = 'all_time' | string;
 
 export interface TaskStore {
   tasks: Task[] | [];
   sprints: Sprint[] | [];
   filterValue: FilterValue;
-  loadTasks: () => Promise<void>;
+  searchQuery: string;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  isLoading: boolean;
+
+  setSearchQuery: (query: string) => void;
+  setCurrentPage: (page: number) => void;
+  refreshTasks: () => Promise<void>;
+  loadTasks: (overrides?: Partial<FetchTasksParams>) => Promise<void>;
   loadSprints: () => Promise<void>;
   addTask: (task: Omit<Task, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateTask: (task: Task) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   addSprint: (
     sprint: Omit<Sprint, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
-  ) => Promise<Sprint>;
+  ) => Promise<void>;
   updateSprint: (sprint: Sprint) => Promise<void>;
   deleteSprint: (id: string) => Promise<void>;
   setFilterValue: (filter: FilterValue) => void;

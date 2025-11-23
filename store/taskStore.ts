@@ -6,24 +6,8 @@ import { supabase } from '../lib/supabase';
 import type { Sprint, Task, TaskStore } from '../types';
 import { persist } from 'zustand/middleware';
 import { useAuthStore } from './authStore';
-
-// Helper function to transform DB task to app Task
-const transformTask = (t: any): Task => ({
-  id: t.id,
-  user_id: t.user_id,
-  sprint_id: t.sprint_id,
-  task: t.task,
-  link: t.link,
-  total_point: t.total_point,
-  label: t.label,
-  priority: t.priority,
-  status: t.status,
-  percent: t.percent,
-  notes: t.notes,
-  owners: t.owners,
-  created_at: t.created_at,
-  updated_at: t.updated_at,
-});
+import { fetchTasks, type FetchTasksParams } from '@/lib/api';
+import { debounce } from 'lodash';
 
 // Helper function to transform DB sprint to app Sprint
 const transformSprint = (s: any): Sprint => ({
@@ -35,14 +19,6 @@ const transformSprint = (s: any): Sprint => ({
   created_at: s.created_at,
   updated_at: s.updated_at,
 });
-
-// Helper function to fetch all tasks (NO user filter) // CHANGED
-const fetchTasks = async () => {
-  const { data, error } = await supabase.from('tasks').select('*');
-
-  if (error) throw error;
-  return data ? data.map(transformTask) : [];
-};
 
 // Helper function to fetch all sprints (NO user filter) // CHANGED
 const fetchSprints = async () => {
@@ -60,18 +36,59 @@ export const useTaskStore = create<TaskStore>()(
     (set, get) => ({
       tasks: [],
       sprints: [],
-      filterValue: 'all_time',
+      isLoading: false,
 
-      // Load ALL tasks, not by user_id // CHANGED
-      loadTasks: async () => {
+      // Filter & Pagination
+      filterValue: 'all_time',
+      searchQuery: '',
+      currentPage: 1,
+      totalPages: 1,
+      totalCount: 0,
+
+      // Setters
+      setSearchQuery: (query: string) => {
+        set({ searchQuery: query, currentPage: 1 });
+        get().loadTasks();
+      },
+      setCurrentPage: (page: number) => {
+        set({ currentPage: page });
+        get().refreshTasks();
+      },
+      setFilterValue: (filter: string) => {
+        set({ filterValue: filter, currentPage: 1 });
+        get().loadTasks();
+      },
+
+      loadTasks: async (overrides?: Partial<FetchTasksParams>) => {
+        const state = get();
+        const params: FetchTasksParams = {
+          filterValue: state.filterValue,
+          searchQuery: state.searchQuery,
+          page: state.currentPage,
+          ...overrides,
+        };
+
+        set({ isLoading: true });
+
         try {
-          const tasks = await fetchTasks();
-          set({ tasks });
-        } catch (error) {
+          const result = await fetchTasks(params);
+
+          set({
+            tasks: result.tasks,
+            totalCount: result.totalCount,
+            totalPages: result.totalPages,
+            isLoading: false,
+          });
+        } catch (error: any) {
           console.error('Failed to load tasks:', error);
           toast.error('Failed to load tasks');
+          set({ tasks: [], totalPages: 1, isLoading: false });
         }
       },
+
+      // Call loadTasks on any change
+      refreshTasks: () => get().loadTasks(),
+      refreshSprints: () => get().loadSprints(),
 
       // Load ALL sprints, not by user_id // CHANGED
       loadSprints: async () => {
@@ -123,12 +140,8 @@ export const useTaskStore = create<TaskStore>()(
 
           if (error) throw error;
 
-          // Replace temp task with real task
-          set((state) => ({
-            tasks: state.tasks.map((t) => (t.id === tempId ? transformTask(data) : t)),
-          }));
-
           toast.success('Task added successfully');
+          await get().loadTasks();
         } catch (error: any) {
           // Rollback on error
           set((state) => ({
@@ -168,6 +181,7 @@ export const useTaskStore = create<TaskStore>()(
           if (error) throw error;
 
           toast.success('Task updated successfully');
+          await get().loadTasks();
         } catch (error: any) {
           // Rollback on error
           set({ tasks: previousTasks });
@@ -190,6 +204,7 @@ export const useTaskStore = create<TaskStore>()(
           if (error) throw error;
 
           toast.success('Task deleted successfully');
+          await get().loadTasks();
         } catch (error: any) {
           // Rollback on error
           set({ tasks: previousTasks });
@@ -230,14 +245,8 @@ export const useTaskStore = create<TaskStore>()(
 
           if (error) throw error;
 
-          // Replace temp sprint with real sprint
-          const realSprint = transformSprint(data);
-          set((state) => ({
-            sprints: state.sprints.map((s) => (s.id === tempId ? realSprint : s)),
-          }));
-
           toast.success('Sprint added successfully');
-          return realSprint;
+          await get().loadSprints();
         } catch (error: any) {
           // Rollback on error
           set((state) => ({
@@ -270,6 +279,7 @@ export const useTaskStore = create<TaskStore>()(
           if (error) throw error;
 
           toast.success('Sprint updated successfully');
+          await get().loadSprints();
         } catch (error: any) {
           // Rollback on error
           set({ sprints: previousSprints });
@@ -300,16 +310,13 @@ export const useTaskStore = create<TaskStore>()(
           if (error) throw error;
 
           toast.success('Sprint and related tasks deleted successfully');
+          await get().loadSprints();
         } catch (error: any) {
           // Rollback on error
           set({ sprints: previousSprints, tasks: previousTasks });
           toast.error('Failed to delete sprint: ' + error.message);
           throw error;
         }
-      },
-
-      setFilterValue: (filter: string) => {
-        set({ filterValue: filter });
       },
 
       importData: async (data: { tasks: Task[]; sprints: Sprint[] }) => {
@@ -365,11 +372,8 @@ export const useTaskStore = create<TaskStore>()(
 
           if (tasksError) throw tasksError;
 
-          // Fetch updated data (ALL, no user filter) // CHANGED
-          const [updatedSprints, updatedTasks] = await Promise.all([fetchSprints(), fetchTasks()]);
-
-          set({ sprints: updatedSprints, tasks: updatedTasks });
-
+          // Load updated data
+          await Promise.all([get().loadSprints(), get().loadTasks()]);
           toast.dismiss(loadingToast);
           toast.success('Data imported successfully');
         } catch (error: any) {
@@ -380,63 +384,28 @@ export const useTaskStore = create<TaskStore>()(
 
       // Setup realtime subscriptions (listen to ALL changes, no user filter) // CHANGED
       setupRealtimeSubscriptions: () => {
-        // Subscribe to tasks changes
         supabase
           .channel('tasks-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'tasks',
-              // removed filter: `user_id=eq.${userId}`,
-            },
-            async () => {
-              try {
-                const freshTasks = await fetchTasks();
-                useTaskStore.setState((state) => ({
-                  ...state,
-                  tasks: freshTasks,
-                }));
-              } catch (error) {
-                console.error('Error fetching tasks on change:', error);
-              }
-            },
-          )
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+            get().loadTasks(); // Auto-refresh on any change
+          })
           .subscribe();
 
-        // Subscribe to sprints changes
         supabase
           .channel('sprints-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'sprints',
-              // removed filter: `user_id=eq.${userId}`,
-            },
-            async () => {
-              try {
-                const freshSprints = await fetchSprints();
-                useTaskStore.setState((state) => ({
-                  ...state,
-                  sprints: freshSprints,
-                }));
-              } catch (error) {
-                console.error('Error fetching sprints on change:', error);
-              }
-            },
-          )
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'sprints' }, () => {
+            get().loadSprints();
+            get().loadTasks(); // Sprint change may affect current_sprint filter
+          })
           .subscribe();
       },
     }),
     {
-      name: 'rescope-task-store',
+      name: 'task-store',
       partialize: (state) => ({
-        tasks: state.tasks,
-        sprints: state.sprints,
         filterValue: state.filterValue,
+        searchQuery: state.searchQuery,
+        currentPage: state.currentPage,
       }),
     },
   ),
