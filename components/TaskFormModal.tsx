@@ -106,7 +106,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({ isOpen, onClose, task }) 
     }
 
     const ownerPointsSum = formData.owners.reduce((sum, owner) => sum + owner.point, 0);
-    if (formData.total_point !== ownerPointsSum) {
+    if (Number(formData.total_point) !== Number(ownerPointsSum)) {
       setError(
         `Total Point (${formData.total_point}) must equal the sum of owner points (${ownerPointsSum}).`,
       );

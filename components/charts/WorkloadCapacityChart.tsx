@@ -11,7 +11,7 @@ import {
   Cell,
 } from 'recharts';
 
-interface WIPBarChartProps {
+interface WorkloadCapacityChartProps {
   data: { name: string; wipAverage: number }[];
 }
 
@@ -20,14 +20,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow-lg">
         <p className="font-bold text-gray-800 dark:text-gray-200">{`${label}`}</p>
-        <p className="text-blue-500">{`WIP Average: ${payload[0].value}`}</p>
+        <p className="text-blue-500">{`Capacity: ${payload[0].value}`}</p>
       </div>
     );
   }
   return null;
 };
 
-const WIPBarChart: React.FC<WIPBarChartProps> = ({ data }) => {
+const WorkloadCapacityChart: React.FC<WorkloadCapacityChartProps> = ({ data }) => {
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -42,8 +42,8 @@ const WIPBarChart: React.FC<WIPBarChartProps> = ({ data }) => {
         <XAxis dataKey="name" tick={{ fill: 'currentColor', fontSize: 12 }} />
         <YAxis tick={{ fill: 'currentColor', fontSize: 12 }} />
         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(200, 200, 200, 0.1)' }} />
-        <Legend />
-        <Bar dataKey="wipAverage" name="WIP Average">
+        <Legend iconType="circle" color="#3b82f6" />
+        <Bar dataKey="wipAverage" name="Capacity Average">
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.wipAverage > 10 ? '#ef4444' : '#3b82f6'} />
           ))}
@@ -53,4 +53,4 @@ const WIPBarChart: React.FC<WIPBarChartProps> = ({ data }) => {
   );
 };
 
-export default WIPBarChart;
+export default WorkloadCapacityChart;

@@ -1,35 +1,86 @@
 import { useMemo } from 'react';
-import type { Task } from '../types';
+import type { Sprint, Task, TaskWithSprint } from '../types';
 import { STATUS_COLORS, TASK_STATUS } from '../constants';
+import moment from 'moment';
 
-export const useChartData = (tasks: Task[]) => {
-  const memberWipAverage = useMemo(() => {
-    const doneTasks = tasks.filter((t) => t.status === TASK_STATUS.COMPLETED);
+export const useChartData = (tasks: Task[], sprints: Sprint[]) => {
+  const sprintMap = useMemo(() => {
+    const sprintMap: Record<string, Sprint> = {};
+    sprints.forEach((sprint) => {
+      sprintMap[sprint.id] = sprint;
+    });
+    return sprintMap;
+  }, [sprints]);
+
+  const tasksWithSprints: TaskWithSprint[] = useMemo(() => {
+    return tasks.map((task) => {
+      if (sprintMap[task.sprint_id]) {
+        return { ...task, sprint: sprintMap[task.sprint_id] };
+      }
+      return task;
+    });
+  }, [tasks, sprintMap]);
+
+  const memberAvgCapacity = useMemo(() => {
+    const doneTasks = tasksWithSprints.filter((t) => t.status === TASK_STATUS.COMPLETED);
     if (doneTasks.length === 0) return [];
 
-    const memberPoints: { [key: string]: number } = {};
-    const memberTaskCount: { [key: string]: number } = {};
+    // Group tasks by sprint_id and member
+    const memberSprintData: {
+      [memberName: string]: {
+        [sprintId: string]: number;
+      };
+    } = {};
 
     doneTasks.forEach((task) => {
+      if (!task.sprint_id) return; // Skip if still no sprint_id
       task.owners.forEach((owner) => {
-        memberPoints[owner.name] = (memberPoints[owner.name] || 0) + owner.point;
-        memberTaskCount[owner.name] = (memberTaskCount[owner.name] || 0) + 1;
+        if (!memberSprintData[owner.name]) {
+          memberSprintData[owner.name] = {};
+        }
+        if (!memberSprintData[owner.name][task.sprint_id]) {
+          memberSprintData[owner.name][task.sprint_id] = 0;
+        }
+        memberSprintData[owner.name][task.sprint_id] += owner.point;
       });
     });
 
-    return Object.keys(memberPoints)
-      .map((name) => ({
-        name,
-        wipAverage: parseFloat((memberPoints[name] / memberTaskCount[name]).toFixed(2)),
-      }))
-      .sort((a, b) => b.wipAverage - a.wipAverage);
-  }, [tasks]);
+    // Calculate average for each member
+    return Object.keys(memberSprintData)
+      .map((name) => {
+        const sprintPoints = Object.values(memberSprintData[name]);
+        const totalPoints = sprintPoints.reduce((sum, points) => sum + points, 0);
+        const numberOfSprints = sprintPoints.length;
+        const wipAverage = parseFloat((totalPoints / numberOfSprints).toFixed(2));
 
-  const teamWipAverage = useMemo(() => {
-    if (!memberWipAverage || memberWipAverage.length === 0) return 0;
-    const totalAverage = memberWipAverage.reduce((sum, member) => sum + member.wipAverage, 0);
-    return parseFloat((totalAverage / memberWipAverage.length).toFixed(2));
-  }, [memberWipAverage]);
+        return {
+          name,
+          wipAverage,
+        };
+      })
+      .sort((a, b) => b.wipAverage - a.wipAverage);
+  }, [tasksWithSprints]);
+
+  const teamAvgCapacity = useMemo(() => {
+    const doneTasks = tasksWithSprints.filter((t) => t.status === TASK_STATUS.COMPLETED);
+    if (doneTasks.length === 0) return 0;
+
+    // Group completed tasks by sprint_id and sum their points
+    const sprintTotals: { [sprintId: string]: number } = {};
+
+    doneTasks.forEach((task) => {
+      if (!task.sprint_id) return; // Skip if still no sprint_id
+      if (!sprintTotals[task.sprint_id]) {
+        sprintTotals[task.sprint_id] = 0;
+      }
+      sprintTotals[task.sprint_id] += Number(task.total_point);
+    });
+
+    const totalPoints = Object.values(sprintTotals).reduce((sum, points) => sum + points, 0);
+    const numberOfSprints = Object.keys(sprintTotals).length;
+
+    return parseFloat((totalPoints / numberOfSprints).toFixed(2));
+  }, [tasksWithSprints]);
 
   const statusDistribution = useMemo(() => {
     const counts: { [key in Task['status']]: number } = {
@@ -38,8 +89,8 @@ export const useChartData = (tasks: Task[]) => {
       Completed: 0,
       Blocked: 0,
     };
-    tasks.forEach((task) => {
-      counts[task.status] += task.total_point;
+    tasksWithSprints.forEach((task) => {
+      counts[task.status] += Number(task.total_point);
     });
 
     return Object.entries(counts).map(([name, value]) => ({
@@ -47,48 +98,56 @@ export const useChartData = (tasks: Task[]) => {
       value,
       fill: STATUS_COLORS[name as keyof typeof STATUS_COLORS],
     }));
-  }, [tasks]);
-
-  const sprintProgress = useMemo(() => {
-    // Mock data for sprint progress line chart
-    const totalPoints = tasks.reduce((sum, t) => sum + t.total_point, 0);
-    const donePoints = tasks
-      .filter((t) => t.status === TASK_STATUS.COMPLETED)
-      .reduce((sum, t) => sum + t.total_point, 0);
-    const idealPace = totalPoints / 5; // 5 stages
-
-    return [
-      { name: 'Start', ideal: totalPoints, actual: totalPoints },
-      { name: 'Day 3', ideal: totalPoints - idealPace * 1 },
-      {
-        name: 'Day 5',
-        ideal: totalPoints - idealPace * 2.5,
-        actual: totalPoints - donePoints * 0.5,
-      },
-      { name: 'Day 7', ideal: totalPoints - idealPace * 4 },
-      { name: 'End', ideal: 0, actual: totalPoints - donePoints },
-    ];
-  }, [tasks]);
+  }, [tasksWithSprints]);
 
   const monthlyProgress = useMemo(() => {
-    // Mock data for monthly trend based on done tasks
-    const donePoints = tasks
-      .filter((t) => t.status === TASK_STATUS.COMPLETED)
-      .reduce((sum, t) => sum + t.total_point, 0);
+    const currentMonth = new Date().getMonth();
+    const lastMonth = currentMonth - 1;
+    const twoMonthsAgo = currentMonth - 2;
+    const threeMonthsAgo = currentMonth - 3;
+
+    const currentMonthDoneTasks = tasksWithSprints.filter(
+      (t) =>
+        t.status === TASK_STATUS.COMPLETED && moment(t?.sprint?.end_date).month() === currentMonth,
+    );
+    const lastMonthDoneTasks = tasksWithSprints.filter(
+      (t) =>
+        t.status === TASK_STATUS.COMPLETED && moment(t?.sprint?.end_date).month() === lastMonth,
+    );
+    const twoMonthsAgoDoneTasks = tasksWithSprints.filter(
+      (t) =>
+        t.status === TASK_STATUS.COMPLETED && moment(t?.sprint?.end_date).month() === twoMonthsAgo,
+    );
+    const threeMonthsAgoDoneTasks = tasksWithSprints.filter(
+      (t) =>
+        t.status === TASK_STATUS.COMPLETED &&
+        moment(t?.sprint?.end_date).month() === threeMonthsAgo,
+    );
 
     return [
-      { name: '3 Months Ago', points: donePoints * 0.7 },
-      { name: '2 Months Ago', points: donePoints * 0.8 },
-      { name: 'Last Month', points: donePoints * 1.1 },
-      { name: 'This Month', points: donePoints },
+      {
+        name: '3 Months Ago',
+        points: threeMonthsAgoDoneTasks.reduce((sum, task) => sum + Number(task.total_point), 0),
+      },
+      {
+        name: '2 Months Ago',
+        points: twoMonthsAgoDoneTasks.reduce((sum, task) => sum + Number(task.total_point), 0),
+      },
+      {
+        name: 'Last Month',
+        points: lastMonthDoneTasks.reduce((sum, task) => sum + Number(task.total_point), 0),
+      },
+      {
+        name: 'This Month',
+        points: currentMonthDoneTasks.reduce((sum, task) => sum + Number(task.total_point), 0),
+      },
     ];
-  }, [tasks]);
+  }, [tasksWithSprints]);
 
   return {
-    memberWipAverage,
-    teamWipAverage,
+    memberAvgCapacity,
+    teamAvgCapacity,
     statusDistribution,
-    sprintProgress,
     monthlyProgress,
   };
 };

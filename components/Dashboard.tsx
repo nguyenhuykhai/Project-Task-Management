@@ -1,9 +1,7 @@
 import React from 'react';
-import type { Task } from '../types';
+import type { Sprint, Task } from '../types';
 import { useChartData } from '../hooks/useChartData';
-import WIPBarChart from './charts/WIPBarChart';
-import StatusDoughnutChart from './charts/StatusDoughnutChart';
-import SprintLineChart from './charts/SprintLineChart';
+import WorkloadCapacityChart from './charts/WorkloadCapacityChart';
 import MonthlyLineChart from './charts/MonthlyLineChart';
 
 const ChartCard: React.FC<{
@@ -60,43 +58,34 @@ const KPICard: React.FC<{
   );
 };
 
-const Dashboard: React.FC<{ tasks: Task[] }> = ({ tasks }) => {
-  const { memberWipAverage, teamWipAverage, statusDistribution, sprintProgress, monthlyProgress } =
-    useChartData(tasks);
+const Dashboard: React.FC<{ tasks: Task[]; sprints: Sprint[] }> = ({ tasks, sprints }) => {
+  const { memberAvgCapacity, teamAvgCapacity, statusDistribution, monthlyProgress } = useChartData(
+    tasks,
+    sprints,
+  );
 
   return (
     <div className="space-y-6">
-      {/* Row 1: Member WIP + KPI + Status */}
+      {/* Row 1: Team Average Capacity + Monthly Points Trend */}
       <div className="grid grid-cols-1 gap-6">
         {/* Right Column: KPI + Status Doughnut */}
         <div className="col-span-6 grid grid-cols-2 gap-6">
           <KPICard
-            title="Team WIP Average"
-            value={teamWipAverage.toFixed(1)}
-            trend={teamWipAverage > 3 ? 'down' : teamWipAverage < 2 ? 'up' : 'neutral'}
+            title="Team Average Capacity"
+            value={teamAvgCapacity.toFixed(1)}
+            trend={teamAvgCapacity > 3 ? 'down' : teamAvgCapacity < 2 ? 'up' : 'neutral'}
           />
-          <ChartCard title="Points by Status">
-            <StatusDoughnutChart data={statusDistribution} />
+          <ChartCard title="Monthly Points Trend" className="h-96">
+            <MonthlyLineChart data={monthlyProgress} />
           </ChartCard>
         </div>
       </div>
 
-      {/* Row 2: Sprint Burndown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Sprint Burndown">
-          <SprintLineChart data={sprintProgress} />
-        </ChartCard>
-
+      {/* Row 2: Member Average Capacity */}
+      <div className="grid grid-cols-1 gap-6">
         {/* Placeholder for future card */}
-        <ChartCard title="Member WIP Average (from 'Completed' tasks)">
-          <WIPBarChart data={memberWipAverage} />
-        </ChartCard>
-      </div>
-
-      {/* Row 3: Full-width Monthly Trend */}
-      <div className="w-full">
-        <ChartCard title="Monthly Points Trend" className="h-96">
-          <MonthlyLineChart data={monthlyProgress} />
+        <ChartCard title="Member Average Capacity">
+          <WorkloadCapacityChart data={memberAvgCapacity} />
         </ChartCard>
       </div>
     </div>

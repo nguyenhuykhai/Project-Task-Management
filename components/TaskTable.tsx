@@ -21,7 +21,6 @@ interface TaskTableProps {
    ------------------------------------------------- */
 const MAX_INLINE_OWNERS = 1; // ≤ 5 → real columns
 const MAX_DISPLAY_IN_CELL = 3; // In collapsed mode, show only 3 + "more"
-const SHOW_OTHERS_COLUMN = true; // show “Others” when > MAX_INLINE_OWNERS
 
 const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit }) => {
   const deleteTask = useTaskStore((state) => state.deleteTask);
@@ -39,7 +38,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit }) => {
       t.owners.forEach((o) => {
         const cur = map.get(o.name) ?? { total: 0, tasks: 0 };
         map.set(o.name, {
-          total: cur.total + o.point,
+          total: cur.total + Number(o.point),
           tasks: cur.tasks + 1,
         });
       }),
@@ -58,10 +57,10 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit }) => {
      2. Totals
      ------------------------------------------------- */
   const totals = React.useMemo(() => {
-    const total = tasks.reduce((a, t) => a + t.total_point, 0);
+    const total = tasks.reduce((a, t) => a + Number(t.total_point), 0);
     const done = tasks
       .filter((t) => t.status === TASK_STATUS.COMPLETED)
-      .reduce((a, t) => a + t.total_point, 0);
+      .reduce((a, t) => a + Number(t.total_point), 0);
     return { total, done, pending: total - done };
   }, [tasks]);
 
@@ -281,18 +280,18 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit }) => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Points</p>
-                <p className="text-2xl font-bold text-primary">{totals.total}</p>
+                <p className="text-2xl font-bold text-primary">{Number(totals.total).toFixed(2)}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Completed</p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {totals.done}
+                  {Number(totals.done).toFixed(2)}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Pending</p>
                 <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                  {totals.pending}
+                  {Number(totals.pending).toFixed(2)}
                 </p>
               </div>
             </div>

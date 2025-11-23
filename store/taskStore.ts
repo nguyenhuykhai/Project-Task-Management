@@ -36,7 +36,7 @@ const transformSprint = (s: any): Sprint => ({
   updated_at: s.updated_at,
 });
 
-// Helper function to fetch all tasks
+// Helper function to fetch all tasks (NO user filter) // CHANGED
 const fetchTasks = async () => {
   const { data, error } = await supabase.from('tasks').select('*');
 
@@ -44,7 +44,7 @@ const fetchTasks = async () => {
   return data ? data.map(transformTask) : [];
 };
 
-// Helper function to fetch all sprints
+// Helper function to fetch all sprints (NO user filter) // CHANGED
 const fetchSprints = async () => {
   const { data, error } = await supabase
     .from('sprints')
@@ -62,15 +62,8 @@ export const useTaskStore = create<TaskStore>()(
       sprints: [],
       filterValue: 'all_time',
 
+      // Load ALL tasks, not by user_id // CHANGED
       loadTasks: async () => {
-        try {
-          const tasks = await fetchTasks();
-          set({ tasks });
-        } catch (error) {
-          console.error('Failed to load tasks:', error);
-          toast.error('Failed to load tasks');
-        }
-
         try {
           const tasks = await fetchTasks();
           set({ tasks });
@@ -80,6 +73,7 @@ export const useTaskStore = create<TaskStore>()(
         }
       },
 
+      // Load ALL sprints, not by user_id // CHANGED
       loadSprints: async () => {
         try {
           const sprints = await fetchSprints();
@@ -326,7 +320,7 @@ export const useTaskStore = create<TaskStore>()(
           // Show loading toast
           const loadingToast = toast.loading('Importing data...');
 
-          // Delete existing data
+          // Delete existing data (still only for this user)
           await Promise.all([
             supabase.from('tasks').delete().eq('user_id', userId),
             supabase.from('sprints').delete().eq('user_id', userId),
@@ -371,7 +365,7 @@ export const useTaskStore = create<TaskStore>()(
 
           if (tasksError) throw tasksError;
 
-          // Fetch updated data
+          // Fetch updated data (ALL, no user filter) // CHANGED
           const [updatedSprints, updatedTasks] = await Promise.all([fetchSprints(), fetchTasks()]);
 
           set({ sprints: updatedSprints, tasks: updatedTasks });
@@ -384,14 +378,8 @@ export const useTaskStore = create<TaskStore>()(
         }
       },
 
-      // Setup realtime subscriptions
+      // Setup realtime subscriptions (listen to ALL changes, no user filter) // CHANGED
       setupRealtimeSubscriptions: () => {
-        const userId = useAuthStore.getState().userId;
-        if (!userId) {
-          console.error('No userId available for subscriptions');
-          return;
-        }
-
         // Subscribe to tasks changes
         supabase
           .channel('tasks-changes')
@@ -401,6 +389,7 @@ export const useTaskStore = create<TaskStore>()(
               event: '*',
               schema: 'public',
               table: 'tasks',
+              // removed filter: `user_id=eq.${userId}`,
             },
             async () => {
               try {
@@ -425,6 +414,7 @@ export const useTaskStore = create<TaskStore>()(
               event: '*',
               schema: 'public',
               table: 'sprints',
+              // removed filter: `user_id=eq.${userId}`,
             },
             async () => {
               try {

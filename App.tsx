@@ -116,7 +116,7 @@ const App: React.FC = () => {
             </TabsList>
 
             <TabsContent value="dashboard" className="space-y-8">
-              <Dashboard tasks={filteredTasks} />
+              <Dashboard tasks={tasks} sprints={sprints} />
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">

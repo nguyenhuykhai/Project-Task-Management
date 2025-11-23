@@ -25,6 +25,7 @@
     "firebase": "^12.6.0",
     "immer": "latest",
     "lucide-react": "^0.553.0",
+    "moment": "^2.30.1",
     "next": "16.0.3",
     "papaparse": "^5.5.3",
     "path": "0.12.7",

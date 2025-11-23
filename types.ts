@@ -32,6 +32,24 @@ export interface Task {
   updated_at: string;
 }
 
+export interface TaskWithSprint extends Task {
+  id: string;
+  user_id: string;
+  sprint_id: string;
+  task: string;
+  link: string;
+  total_point: number;
+  label: TASK_LABEL;
+  priority: TASK_PRIORITY;
+  status: TASK_STATUS;
+  percent: string;
+  notes: string;
+  owners: Owner[];
+  created_at: string;
+  updated_at: string;
+  sprint?: Sprint;
+}
+
 export type FilterValue = 'current_sprint' | 'all_time' | string;
 
 export interface TaskStore {
