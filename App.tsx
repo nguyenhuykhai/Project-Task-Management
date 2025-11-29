@@ -141,33 +141,36 @@ const App: React.FC = () => {
                     <CardTitle className="text-2xl">Task Details</CardTitle>
                     <CardDescription>View and manage all tasks</CardDescription>
                   </div>
-                  <Button
-                    onClick={() => handleOpenTaskModal()}
-                    disabled={sprints.length === 0}
-                    size="lg"
-                    className="gap-2"
-                  >
-                    <Plus size={20} />
-                    <span className="hidden sm:inline">Add Task</span>
-                  </Button>
                 </CardHeader>
                 <CardContent>
                   {/* Search */}
-                  <div className="flex items-center gap-4">
-                    <div className="relative flex-1 max-w-md">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search tasks, owners, labels..."
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        className="pl-10"
-                      />
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search tasks, owners, labels..."
+                          value={searchValue}
+                          onChange={(e) => setSearchValue(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {isLoading
+                          ? 'Loading...'
+                          : `${totalCount} task${totalCount !== 1 ? 's' : ''}`}
+                      </span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {isLoading
-                        ? 'Loading...'
-                        : `${totalCount} task${totalCount !== 1 ? 's' : ''}`}
-                    </span>
+
+                    <Button
+                      onClick={() => handleOpenTaskModal()}
+                      disabled={sprints.length === 0}
+                      size="lg"
+                      className="gap-2"
+                    >
+                      <Plus size={20} />
+                      <span className="hidden sm:inline">Add Task</span>
+                    </Button>
                   </div>
 
                   {sprints.length > 0 ? (

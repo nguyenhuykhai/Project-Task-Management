@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
 import type { Task } from '../types';
-import { Edit, Trash2, ExternalLink, Users } from 'lucide-react';
+import { Edit, Trash2, ExternalLink, Users, Copy, Link2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { TASK_STATUS } from '@/constants';
+import TaskNameCell from './TaskNameCell';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -25,13 +26,12 @@ const MAX_DISPLAY_IN_CELL = 3; // In collapsed mode, show only 3 + "more"
 const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit }) => {
   const deleteTask = useTaskStore((state) => state.deleteTask);
   const sprints = useTaskStore((state) => state.sprints);
-
-  const sprintMap = React.useMemo(() => new Map(sprints.map((s) => [s.id, s.name])), [sprints]);
+  const sprintMap = useMemo(() => new Map(sprints.map((s) => [s.id, s.name])), [sprints]);
 
   /* -------------------------------------------------
      1. Owner statistics (used for header + tooltips)
      ------------------------------------------------- */
-  const ownerStats = React.useMemo(() => {
+  const ownerStats = useMemo(() => {
     const map = new Map<string, { total: number; tasks: number }>();
 
     tasks.forEach((t) =>
@@ -197,25 +197,12 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onEdit }) => {
             <TableBody>
               {tasks.length > 0 ? (
                 tasks.map((task) => (
-                  <TableRow key={task.id} className="hover:bg-muted/50 transition-colors">
+                  <TableRow
+                    key={task.id}
+                    className="hover:bg-muted/50 transition-colors [&>td]:py-4"
+                  >
                     {/* Task */}
-                    <TableCell className="font-medium max-w-xs">
-                      <div className="flex items-center gap-2">
-                        {task.link ? (
-                          <a
-                            href={task.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 hover:underline text-primary font-medium"
-                          >
-                            {task.task}
-                            <ExternalLink size={14} className="text-muted-foreground" />
-                          </a>
-                        ) : (
-                          <span className="font-medium">{task.task}</span>
-                        )}
-                      </div>
-                    </TableCell>
+                    <TaskNameCell task={task} />
 
                     {/* Sprint */}
                     <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
