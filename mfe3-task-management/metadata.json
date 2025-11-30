@@ -1,0 +1,4 @@
+{
+  "name": "Sprint Task Dashboard",
+  "description": "A standalone single-page web app to manually add tasks and visualize work-in-progress (WIP) charts in real-time. All data is stored locally in your browser."
+}
