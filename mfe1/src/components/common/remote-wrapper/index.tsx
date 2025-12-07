@@ -1,9 +1,3 @@
-export const LoadingComponent = () => (
-  <div style={{ padding: "20px", textAlign: "center" }}>
-    <div>Loading remote application...</div>
-  </div>
-);
-
 export const ErrorFallback = ({ error }: { error: Error }) => (
   <div
     style={{
