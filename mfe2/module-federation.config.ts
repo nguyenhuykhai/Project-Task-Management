@@ -11,13 +11,14 @@ export default createModuleFederationConfig({
     ...dependencies,
     react: {
       singleton: true,
+      requiredVersion: false,
     },
     "react-dom": {
       singleton: true,
+      requiredVersion: false,
     },
   },
   bridge: {
-    // Enable Bridge Router routing capabilities, default is true
     enableBridgeRouter: true,
   },
   dts: false,

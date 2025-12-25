@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
+    /* path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "host/*": ["./src/types/host.d.ts"]
+    },
+
     "lib": ["DOM", "ES2020", "DOM.Iterable"],
     "jsx": "react-jsx",
     "target": "ES2020",

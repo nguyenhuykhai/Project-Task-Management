@@ -4,6 +4,7 @@ import { Outlet } from "react-router";
 import AdminPanelLayout from "../admin-panel/admin-panel-layout";
 import { ContentLayout } from "../admin-panel/content-layout";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { NotificationCenter } from "@/components/common/atoms/notifications/NotificationCenter";
 
 const AppLayout = ({ children }: { children?: ReactNode }) => {
   return (
@@ -17,6 +18,7 @@ const AppLayout = ({ children }: { children?: ReactNode }) => {
           </AdminPanelLayout>
         </div>
       </SidebarProvider>
+      <NotificationCenter />
     </ThemeProvider>
   );
 };

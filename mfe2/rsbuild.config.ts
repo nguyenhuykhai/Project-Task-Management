@@ -1,12 +1,22 @@
 import { pluginModuleFederation } from "@module-federation/rsbuild-plugin";
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
-import mfConfig from "./module-federation.config";
+import { dependencies } from "@module-federation/enhanced";
+
+const buildRemotes = () => {
+  const remotes: Record<string, string> = {};
+  const mfe1Url = process.env.VITE_MFE1_BASE_URL + "/remoteEntry.js";
+  const mfe1Scope = process.env.VITE_MFE1_SCOPE || "host";
+  remotes[mfe1Scope] = `${mfe1Scope}@${mfe1Url}`;
+
+  return remotes;
+};
 
 export default defineConfig({
   server: {
     port: 3002,
-    cors: true,
+    host: "localhost", // Add this
+    cors: true, // Add this
   },
   dev: {
     assetPrefix: "http://localhost:3002",
@@ -14,13 +24,30 @@ export default defineConfig({
   output: {
     assetPrefix: "http://localhost:3002",
   },
-  html: {
-    template: "./index.html",
-  },
-  source: {
-    entry: {
-      index: "./src/index.tsx",
-    },
-  },
-  plugins: [pluginReact(), pluginModuleFederation(mfConfig)],
+  plugins: [
+    pluginReact(),
+    pluginModuleFederation({
+      name: "remote",
+      remotes: buildRemotes(),
+      exposes: {
+        "./Button": "./src/components/export-app",
+      },
+      filename: "remoteEntry.js",
+      shared: {
+        ...dependencies,
+        react: {
+          singleton: true,
+          requiredVersion: false,
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: false,
+        },
+      },
+      bridge: {
+        enableBridgeRouter: true,
+      },
+      dts: false,
+    }),
+  ],
 });
