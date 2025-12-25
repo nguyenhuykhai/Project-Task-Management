@@ -5,7 +5,7 @@
 Install the dependencies:
 
 ```bash
-bun install
+pnpm install
 ```
 
 ## Get started
@@ -13,19 +13,19 @@ bun install
 Start the dev server, and the app will be available at [http://localhost:3000](http://localhost:3000).
 
 ```bash
-bun run dev
+pnpm run dev
 ```
 
 Build the app for production:
 
 ```bash
-bun run build
+pnpm run build
 ```
 
 Preview the production build locally:
 
 ```bash
-bun run preview
+pnpm run preview
 ```
 
 ## Learn more
