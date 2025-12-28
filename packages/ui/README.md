@@ -1,229 +1,206 @@
 # @repo/ui - Shared UI Components
 
-Shared UI component library built with [shadcn/ui](https://ui.shadcn.com/) for the micro-frontend monorepo.
+Shared UI component library built with [shadcn/ui](https://ui.shadcn.com/) and [Tailwind CSS](https://tailwindcss.com/) for the micro-frontend monorepo.
 
-## Available Components
+## 📦 Available Components
 
-This package includes the following shadcn/ui components:
+### Shadcn/UI Components (14)
 
-- **Button** - Versatile button with multiple variants
-- **Card** - Card container with header, content, and footer
-- **Input** - Styled input field
-- **Avatar** - User avatar with fallback
-- **Badge** - Small badge for labels and tags
-- **Collapsible** - Collapsible content section
-- **Dropdown Menu** - Dropdown menu with items
-- **Loader** - Loading spinner component
-- **Scroll Area** - Custom scrollable area
-- **Separator** - Visual divider
-- **Sheet** - Slide-over dialog panel
-- **Sidebar** - Navigation sidebar
-- **Skeleton** - Loading placeholder
-- **Tooltip** - Informative tooltip
+Avatar, Badge, Breadcrumb, Button, Card, Collapsible, Dropdown Menu, Input, Scroll Area, Separator, Sheet, Sidebar, Skeleton, Tooltip
 
-## Usage in Micro Frontends
+### Custom Components
 
-### Import Components
+- **Loader** - 5 animated loading components (LoaderOne to LoaderFive)
+- **EventDebugger** - Development tool for monitoring event bus
+
+## 🚀 Usage
 
 ```typescript
-// In apps/mfe1 or apps/mfe2
 import { Button, Card, Input, Avatar } from "@repo/ui";
 
-function MyComponent() {
+function Example() {
   return (
     <Card>
-      <Button>Click me</Button>
-      <Input placeholder="Type here..." />
+      <Avatar src="/avatar.jpg" fallback="JD" />
+      <Input placeholder="Email" />
+      <Button variant="default">Save</Button>
+      <Button variant="destructive">Delete</Button>
     </Card>
   );
 }
 ```
 
-### Import Utilities
+## ➕ Adding New UI Components
 
-```typescript
-import { cn } from "@repo/ui";
-
-// Use cn to merge Tailwind classes
-<div className={cn("base-class", conditionalClass && "conditional-class")} />
-```
-
-## Adding New Components
-
-To add a new shadcn/ui component to the shared package:
+### Step 1: Navigate to UI Package
 
 ```bash
-# Navigate to the UI package
 cd packages/ui
-
-# Add a component (e.g., dialog, select, etc.)
-pnpm ui:add dialog
-
-# The component will be added to src/components/
 ```
 
-After adding a component, **export it** from `src/index.ts`:
-
-```typescript
-export * from "./components/dialog";
-```
-
-## Theme Customization
-
-The package uses CSS variables for theming, defined in each micro-frontend's CSS file:
-
-### MFE1 Theme Variables
-
-Located in `apps/mfe1/src/mfe1.css` under `#mfe1-root`
-
-### MFE2 Theme Variables
-
-Located in `apps/mfe2/src/mfe2.css` under `#mfe2-root`
-
-### Available CSS Variables
-
-```css
---background
---foreground
---primary
---primary-foreground
---secondary
---secondary-foreground
---muted
---muted-foreground
---accent
---accent-foreground
---destructive
---destructive-foreground
---border
---input
---ring
---radius
-```
-
-## Styling Components
-
-### Using Default Variants
-
-Most components have built-in variants:
-
-```typescript
-<Button variant="default">Default</Button>
-<Button variant="destructive">Delete</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="link">Link</Button>
-
-<Button size="default">Default Size</Button>
-<Button size="sm">Small</Button>
-<Button size="lg">Large</Button>
-<Button size="icon">Icon</Button>
-```
-
-### Custom Styling
-
-Add custom Tailwind classes via `className`:
-
-```typescript
-<Button className="bg-blue-600 hover:bg-blue-700">
-  Custom Blue Button
-</Button>
-```
-
-**Note**: Custom classes will merge with variant classes using `cn()` utility.
-
-## CSS Isolation
-
-Each micro-frontend has its own scoped theme:
-
-- `#mfe1-root` for MFE1
-- `#mfe2-root` for MFE2
-
-This ensures theme variables are isolated and won't conflict when micro-frontends are loaded together.
-
-## TypeScript Support
-
-All components are fully typed. Import types directly:
-
-```typescript
-import type { ButtonProps } from "@repo/ui";
-
-const MyButton: React.FC<ButtonProps> = (props) => {
-  return <Button {...props} />;
-};
-```
-
-## Development
-
-### Type Checking
-
-````bash
-pnpm typecheck
-``
-`
-
-### Adding Dependencies
-
-If you need to add a new Radix UI primitive:
+### Step 2: Add Component with Shadcn CLI
 
 ```bash
-pnpm add @radix-ui/react-<component-name>
-````
+# Interactive mode - select from list
+pnpm ui:add
 
-## Package Structure
-
-```
-packages/ui/
-├── src/
-│   ├── components/     # shadcn/ui components
-│   ├── devtools/       # Development tools (EventDebugger, etc.)
-│   ├── hooks/          # Shared React hooks
-│   ├── lib/            # Utilities (cn, etc.)
-│   └── index.ts        # Main exports
-├── components.json     # shadcn CLI config
-├── tailwind.config.ts  # Tailwind configuration
-├── tsconfig.json       # TypeScript config
-└── package.json
+# Direct install
+pnpm ui:add dialog
+pnpm ui:add select
+pnpm ui:add tabs
 ```
 
-## Troubleshooting
+The component will be created in `src/components/ui/`
 
-### Components not rendering correctly
+### Step 3: Export the Component
 
-Make sure the micro-frontend's CSS file includes CSS variables and Tailwind directives:
+Open `src/index.ts` and add the export:
+
+```typescript
+export * from "./components/ui/dialog";
+```
+
+### Step 4: Use in Your App
+
+```typescript
+import { Dialog } from "@repo/ui";
+
+<Dialog>
+  {/* Your content */}
+</Dialog>
+```
+
+## 🔒 CSS Isolation Setup
+
+Each micro-frontend has isolated styles using ID-scoped Tailwind to prevent conflicts.
+
+### How It Works
+
+**MFE1** wraps everything in `#mfe1-root`:
+
+```tsx
+<div id="mfe1-root">
+  <App />
+</div>
+```
+
+**MFE2** wraps everything in `#mfe2-root`:
+
+```tsx
+<div id="mfe2-root">
+  <App />
+</div>
+```
+
+### Setting Up Isolation for a New Micro-Frontend
+
+#### 1. Create CSS File
+
+Create `apps/your-mfe/src/your-mfe.css`:
 
 ```css
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap");
+
+@custom-variant dark (&:is(.dark *));
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-#mfe1-root {
-  --background: 220 16% 96%;
-  --primary: 222 20% 70%;
-  /* ... other variables */
+/* Define CSS variables scoped to your app */
+#your-mfe-root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --primary: 0 72.2% 50.6%;
+  --primary-foreground: 0 85.7% 97.3%;
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent: 0 0% 96.1%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: 0 72.2% 50.6%;
+  --radius: 0.5rem;
+}
+
+#your-mfe-root.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --primary: 0 72.2% 50.6%;
+  --primary-foreground: 0 85.7% 97.3%;
+  /* ... other dark mode variables */
 }
 ```
 
-### Import errors
+**Important**: Use **space-separated** HSL values (no commas):
 
-Ensure `tsconfig.json` has the correct path alias:
+- ✅ `--primary: 0 72.2% 50.6%;`
+- ❌ `--primary: 0, 72.2%, 50.6%;`
 
-```json
-{
-  "compilerOptions": {
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
-}
-```
+#### 2. Create Tailwind Config
 
-### Styling conflicts
-
-Use CSS isolation by wrapping your micro-frontend in a root container:
+Create `apps/your-mfe/tailwind.config.ts`:
 
 ```typescript
-<div id="mfe1-root">
-  {/* Your app */}
+import { createConfig } from "@repo/ui/tailwind.config";
+
+const baseConfig = createConfig({
+  important: "#your-mfe-root", // Scope all styles to your app
+});
+
+export default {
+  ...baseConfig,
+  content: ["./src/**/*.{ts,tsx}", "../../packages/ui/src/**/*.{ts,tsx}"],
+  important: "#your-mfe-root",
+};
+```
+
+#### 3. Wrap Your App
+
+In your bootstrap/main file:
+
+```tsx
+import "./your-mfe.css";
+
+function App() {
+  return (
+    <div id="your-mfe-root">
+      {/* Your entire app */}
+    </div>
+  );
+}
+```
+
+#### 4. Verify Isolation
+
+- ✅ Your styles only apply inside `#your-mfe-root`
+- ✅ Other micro-frontends' styles don't affect your app
+- ✅ Shared `@repo/ui` components work correctly
+
+## 🔍 Troubleshooting
+
+### Components Not Styled
+
+**Check 1**: CSS file imported?
+
+```typescript
+import "./your-mfe.css";
+```
+
+**Check 2**: Root container has correct ID?
+
+```tsx
+<div id="your-mfe-root">
+  {/* Must match CSS selector */}
 </div>
 ```
+
+## 📚 Resources
+
+- [Shadcn/UI Docs](https://ui.shadcn.com/)
+- [Tailwind CSS Docs](https://tailwindcss.com/)
+- [Available Shadcn Components](https://ui.shadcn.com/docs/components)
