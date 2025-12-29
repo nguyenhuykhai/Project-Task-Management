@@ -8,7 +8,10 @@ const createConfig = (options?: {
   darkMode: ["class"],
   prefix: options?.prefix || "",
   important: options?.important, // Will be used for scoping
-  content: [],
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx,mdx}",
+    "./.storybook/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
     container: {
       center: true,

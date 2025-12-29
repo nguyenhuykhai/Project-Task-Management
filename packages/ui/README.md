@@ -70,6 +70,61 @@ import { Dialog } from "@repo/ui";
 </Dialog>
 ```
 
+## 📖 Storybook
+
+Develop and test components in isolation using Storybook.
+
+### Running Storybook
+
+```bash
+cd packages/ui
+pnpm storybook
+```
+
+Storybook will open at **http://localhost:6006**
+
+### Building Storybook
+
+Build static Storybook for deployment:
+
+```bash
+cd packages/ui
+pnpm build-storybook
+```
+
+Output will be in `storybook-static/`
+
+### Available Stories
+
+- **Button** - All variants and sizes with interactive controls
+- **Card** - Different card layouts
+- **Input** - Various input types and states
+- **Avatar** - Image and fallback examples
+
+### Creating New Stories
+
+Create a `.stories.tsx` file next to your component:
+
+```typescript
+import type { Meta, StoryObj } from "@storybook/react";
+import { YourComponent } from "./your-component";
+
+const meta: Meta<typeof YourComponent> = {
+  title: "UI/YourComponent",
+  component: YourComponent,
+  tags: ["autodocs"],
+};
+
+export default meta;
+type Story = StoryObj<typeof YourComponent>;
+
+export const Default: Story = {
+  args: {
+    // component props
+  },
+};
+```
+
 ## 🔒 CSS Isolation Setup
 
 Each micro-frontend has isolated styles using ID-scoped Tailwind to prevent conflicts.
@@ -167,11 +222,7 @@ In your bootstrap/main file:
 import "./your-mfe.css";
 
 function App() {
-  return (
-    <div id="your-mfe-root">
-      {/* Your entire app */}
-    </div>
-  );
+  return <div id="your-mfe-root">{/* Your entire app */}</div>;
 }
 ```
 
@@ -194,9 +245,7 @@ import "./your-mfe.css";
 **Check 2**: Root container has correct ID?
 
 ```tsx
-<div id="your-mfe-root">
-  {/* Must match CSS selector */}
-</div>
+<div id="your-mfe-root">{/* Must match CSS selector */}</div>
 ```
 
 ## 📚 Resources
