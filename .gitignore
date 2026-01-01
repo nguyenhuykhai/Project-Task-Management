@@ -30,10 +30,9 @@ build/
 .rspack-profile-*/
 
 # Environment files
-.env
-.env.local
-.env.development.local
-.env.production.local
+.env*
+!.env.example
+!.env.development
 
 # Logs & debug
 *.log
