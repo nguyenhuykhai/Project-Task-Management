@@ -3,11 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { Button } from "@repo/ui";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@repo/ui";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@repo/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,7 +61,7 @@ export function CollapseMenuButton({
       >
         <Button
           variant={isSubmenuActive ? "secondary" : "ghost"}
-          className="w-full justify-start h-10"
+          className="w-full justify-start h-10 hover:bg-accent dark:hover:bg-zinc-800"
         >
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center">
@@ -74,7 +70,7 @@ export function CollapseMenuButton({
               </span>
               <p
                 className={cn(
-                  "max-w-[150px] truncate",
+                  "max-w-[150px] truncate text-foreground",
                   isOpen
                     ? "translate-x-0 opacity-100"
                     : "-translate-x-96 opacity-0"
@@ -85,7 +81,7 @@ export function CollapseMenuButton({
             </div>
             <div
               className={cn(
-                "whitespace-nowrap",
+                "whitespace-nowrap text-muted-foreground",
                 isOpen
                   ? "translate-x-0 opacity-100"
                   : "-translate-x-96 opacity-0"
@@ -108,7 +104,7 @@ export function CollapseMenuButton({
                 ? "secondary"
                 : "ghost"
             }
-            className="w-full justify-start h-10 mb-1"
+            className="w-full justify-start h-10 mb-1 hover:bg-accent dark:hover:bg-zinc-800"
             asChild
           >
             <Link to={href}>
@@ -117,7 +113,7 @@ export function CollapseMenuButton({
               </span>
               <p
                 className={cn(
-                  "max-w-[170px] truncate",
+                  "max-w-[170px] truncate text-foreground",
                   isOpen
                     ? "translate-x-0 opacity-100"
                     : "-translate-x-96 opacity-0"
@@ -138,7 +134,7 @@ export function CollapseMenuButton({
             <DropdownMenuTrigger asChild>
               <Button
                 variant={isSubmenuActive ? "secondary" : "ghost"}
-                className="w-full justify-start h-10 mb-1"
+                className="w-full justify-start h-10 mb-1 hover:bg-accent dark:hover:bg-zinc-800"
               >
                 <div className="w-full items-center flex justify-between">
                   <div className="flex items-center">
@@ -147,7 +143,7 @@ export function CollapseMenuButton({
                     </span>
                     <p
                       className={cn(
-                        "max-w-[200px] truncate",
+                        "max-w-[200px] truncate text-foreground",
                         isOpen === false ? "opacity-0" : "opacity-100"
                       )}
                     >
@@ -163,8 +159,14 @@ export function CollapseMenuButton({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent side="right" sideOffset={25} align="start">
-        <DropdownMenuLabel className="max-w-[190px] truncate">
+      {/* Updated: Dark mode background and border */}
+      <DropdownMenuContent
+        side="right"
+        sideOffset={25}
+        align="start"
+        className="bg-popover dark:bg-zinc-950 border-border dark:border-zinc-800"
+      >
+        <DropdownMenuLabel className="max-w-[190px] truncate text-foreground">
           {label}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -173,7 +175,7 @@ export function CollapseMenuButton({
             <Link
               className={`cursor-pointer ${
                 ((active === undefined && pathname === href) || active) &&
-                "bg-secondary"
+                "bg-secondary dark:bg-zinc-800 text-foreground"
               }`}
               to={href}
             >
@@ -181,7 +183,7 @@ export function CollapseMenuButton({
             </Link>
           </DropdownMenuItem>
         ))}
-        <DropdownMenuArrow className="fill-border" />
+        <DropdownMenuArrow className="fill-border dark:fill-zinc-800" />
       </DropdownMenuContent>
     </DropdownMenu>
   );

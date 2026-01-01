@@ -29,7 +29,7 @@ export function Menu({ isOpen }: MenuProps) {
           {menuList.map(({ groupLabel, menus }, index) => (
             <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
-                <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
+                <p className="text-sm font-medium text-muted-foreground dark:text-gray-100 px-4 pb-2 max-w-[248px] truncate">
                   {groupLabel}
                 </p>
               ) : !isOpen && isOpen !== undefined && groupLabel ? (
@@ -37,11 +37,11 @@ export function Menu({ isOpen }: MenuProps) {
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger className="w-full">
                       <div className="w-full flex justify-center items-center">
-                        <Ellipsis className="h-5 w-5" />
+                        <Ellipsis className="h-5 w-5 text-muted-foreground dark:text-gray-100" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="right">
-                      <p>{groupLabel}</p>
+                      <p className="text-gray-100">{groupLabel}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -63,21 +63,33 @@ export function Menu({ isOpen }: MenuProps) {
                                   ? "secondary"
                                   : "ghost"
                               }
-                              className="w-full justify-start h-10 mb-1"
+                              className={cn(
+                                "w-full justify-start h-10 mb-1 hover:bg-accent dark:hover:bg-zinc-500",
+                                isOpen === false && "-translate-x-96 opacity-0",
+                                active && "dark:hover:bg-gray-100"
+                              )}
                               asChild
                             >
                               <Link to={href}>
                                 <span
                                   className={cn(isOpen === false ? "" : "mr-4")}
                                 >
-                                  <Icon size={18} />
+                                  <Icon
+                                    size={18}
+                                    className={cn(
+                                      "text-gray-950 dark:text-gray-100",
+                                      active &&
+                                        "text-gray-950 dark:text-gray-950"
+                                    )}
+                                  />
                                 </span>
                                 <p
                                   className={cn(
-                                    "max-w-[200px] truncate",
+                                    "max-w-[200px] truncate text-foreground dark:text-gray-100",
                                     isOpen === false
                                       ? "-translate-x-96 opacity-0"
                                       : "translate-x-0 opacity-100",
+                                    active && "text-gray-950 dark:text-gray-950"
                                   )}
                                 >
                                   {label}
@@ -87,7 +99,7 @@ export function Menu({ isOpen }: MenuProps) {
                           </TooltipTrigger>
                           {isOpen === false && (
                             <TooltipContent side="right">
-                              {label}
+                              <p className="text-gray-100">{label}</p>
                             </TooltipContent>
                           )}
                         </Tooltip>
@@ -107,7 +119,7 @@ export function Menu({ isOpen }: MenuProps) {
                         isOpen={isOpen}
                       />
                     </div>
-                  ),
+                  )
               )}
             </li>
           ))}
@@ -118,15 +130,15 @@ export function Menu({ isOpen }: MenuProps) {
                   <Button
                     onClick={() => {}}
                     variant="outline"
-                    className="w-full justify-center h-10 mt-5"
+                    className="w-full justify-center h-10 mt-5 hover:bg-accent dark:hover:bg-zinc-800"
                   >
                     <span className={cn(isOpen === false ? "" : "mr-4")}>
                       <LogOut size={18} />
                     </span>
                     <p
                       className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100",
+                        "whitespace-nowrap text-foreground",
+                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
                       )}
                     >
                       Sign out

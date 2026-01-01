@@ -23,7 +23,8 @@ export function Sidebar() {
       <div
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
-        className="relative h-full flex flex-col px-3 py-4 overflow-y-auto bg-sidebar border-r border-sidebar-border shadow-md dark:shadow-zinc-800"
+        // Updated: Added dark background and border
+        className="relative h-full flex flex-col px-3 py-4 overflow-y-auto bg-sidebar dark:bg-zinc-950 border-r border-sidebar-border dark:border-zinc-800 shadow-md dark:shadow-zinc-800"
       >
         <Button
           className={cn(
@@ -35,12 +36,12 @@ export function Sidebar() {
         >
           <Link
             to="/task-management"
-            className="flex items-center gap-2 text-sidebar-foreground hover:text-sidebar-accent-foreground"
+            className="flex items-center gap-2 text-sidebar-foreground dark:text-zinc-100 hover:text-sidebar-accent-foreground"
           >
             <PanelsTopLeft className="w-6 h-6 mr-1" />
             <h1
               className={cn(
-                "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
+                "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300 text-sidebar-foreground dark:text-zinc-100",
                 !getOpenState()
                   ? "-translate-x-96 opacity-0 hidden"
                   : "translate-x-0 opacity-100"

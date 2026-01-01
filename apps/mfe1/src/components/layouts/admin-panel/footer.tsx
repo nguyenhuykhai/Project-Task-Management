@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 export function Footer() {
   return (
-    <div className="z-20 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="z-20 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-zinc-800 border-t border-border dark:border-zinc-800">
       <div className="mx-4 md:mx-8 flex h-14 items-center">
         <p className="text-xs md:text-sm leading-loose text-muted-foreground text-left">
           Built on top of{" "}
@@ -10,7 +10,7 @@ export function Footer() {
             to="https://ui.shadcn.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium underline underline-offset-4"
+            className="font-medium underline underline-offset-4 hover:text-foreground transition-colors"
           >
             shadcn/ui
           </Link>
@@ -19,7 +19,7 @@ export function Footer() {
             to="https://github.com/salimi-my/shadcn-ui-sidebar"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium underline underline-offset-4"
+            className="font-medium underline underline-offset-4 hover:text-foreground transition-colors"
           >
             GitHub
           </Link>
