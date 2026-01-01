@@ -36,7 +36,21 @@ Before deploying, ensure:
 
 ### **Step 3: Environment Variables**
 
-No environment variables are required for `mfe2` initially. Add any backend API URLs or feature flags as needed.
+Add the following environment variable:
+
+| Key                  | Value                                 | Example                                      |
+| -------------------- | ------------------------------------- | -------------------------------------------- |
+| `VITE_MFE2_BASE_URL` | **Production URL of this deployment** | `https://micro-frontend-skeleton.vercel.app` |
+
+> **💡 Why this is needed:**  
+> The `assetPrefix` in rsbuild.config.ts uses this to correctly resolve static assets and the `remoteEntry.js` file in production.
+
+> **⚠️ IMPORTANT:**  
+> After deploying mfe2 for the first time, you'll need to:
+>
+> 1. Copy the production URL from Vercel Dashboard
+> 2. Add it as `VITE_MFE2_BASE_URL` environment variable
+> 3. Redeploy to apply the change
 
 ### **Step 4: Deploy**
 
