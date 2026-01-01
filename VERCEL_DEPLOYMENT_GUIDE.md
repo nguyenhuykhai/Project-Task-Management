@@ -141,7 +141,7 @@ We've implemented a **three-part solution**:
    ```
 3. **Updated `vercel.json` files** → Modified to use:
    - `installCommand: "pnpm install --no-frozen-lockfile"`
-   - Corrected `outputDirectory` paths (`apps/mfe1/dist`, `apps/mfe2/dist`)
+   - Corrected `outputDirectory` to `dist` (relative to Root Directory)
 
 **Verification:**
 
