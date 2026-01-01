@@ -15,12 +15,10 @@ const mount = (el: HTMLElement) => {
   return root;
 };
 
-// For standalone development
-if (process.env.NODE_ENV === "development") {
-  const devRoot = document.getElementById("root");
-  if (devRoot) {
-    mount(devRoot);
-  }
+// Mount standalone (when not consumed as a Module Federation remote)
+const devRoot = document.getElementById("root");
+if (devRoot) {
+  mount(devRoot);
 }
 
 export { mount };
