@@ -125,6 +125,74 @@ export const Default: Story = {
 };
 ```
 
+## 🎯 Portal Container Context
+
+### Why This Matters for Micro-Frontends
+
+When building micro-frontends with scoped CSS (using Tailwind's `important` selector), portal-based components (like `DropdownMenu`, `Sheet`, `Dialog`) render outside your app's root container by default. This causes Tailwind styles to not apply.
+
+**The Problem:**
+
+```tsx
+// ❌ Dropdown menu renders to document.body, outside #mfe1-root
+// Tailwind styles with `important: "#mfe1-root"` don't apply!
+<DropdownMenuContent>...</DropdownMenuContent>
+```
+
+**The Solution:**
+We provide a `PortalContainerProvider` that automatically configures all portal components to render within your scoped container.
+
+### Usage
+
+#### 1. Wrap Your App (Once)
+
+In your app's bootstrap file:
+
+```tsx
+import { PortalContainerProvider } from "@repo/ui";
+
+const rootElement = document.getElementById("root")!;
+const mfe1Container = document.getElementById("mfe1-root");
+
+root.render(
+  <PortalContainerProvider container={mfe1Container}>
+    <App />
+  </PortalContainerProvider>
+);
+```
+
+#### 2. Use Portal Components Normally
+
+All portal components now automatically use the container from context:
+
+```tsx
+// ✅ No manual container prop needed!
+<DropdownMenuContent className="w-56">...</DropdownMenuContent>
+<SheetContent>...</SheetContent>
+```
+
+#### 3. Override When Needed (Optional)
+
+You can still override the container for specific components:
+
+```tsx
+<DropdownMenuContent container={customElement}>...</DropdownMenuContent>
+```
+
+### Supported Components
+
+The following components automatically use `PortalContainerProvider`:
+
+- `DropdownMenuContent`
+- `SheetContent`
+- Any other portal-based Radix UI components in this package
+
+### Technical Details
+
+- **Context**: `PortalContainerContext` provides the container element
+- **Hook**: `usePortalContainer()` to access the container in custom components
+- **Fallback**: If no provider is present, portals render to `document.body` (default Radix UI behavior)
+
 ## 🔒 CSS Isolation Setup
 
 Each micro-frontend has isolated styles using ID-scoped Tailwind to prevent conflicts.

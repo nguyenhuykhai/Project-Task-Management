@@ -17,6 +17,12 @@ export * from "./components/ui/sidebar";
 export * from "./components/ui/skeleton";
 export * from "./components/ui/tooltip";
 
+// Contexts
+export {
+  PortalContainerProvider,
+  usePortalContainer,
+} from "./contexts/portal-container";
+
 // Custom components
 export * from "./components/common/loader";
 

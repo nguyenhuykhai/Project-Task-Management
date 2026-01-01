@@ -2,9 +2,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
-@tailwind base;
 
 @layer base {
   #mfe1-root {

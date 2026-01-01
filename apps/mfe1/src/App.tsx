@@ -1,9 +1,20 @@
-const App = () => {
+import { PortalContainerProvider } from "@repo/ui";
+import { useState } from "react";
+import { BrowserRouter } from "react-router";
+import { MainAppRoutes } from "./router/routes/main-app-routes";
+
+function App() {
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
+
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-4">HOME PAGE</h1>
-    </>
+    <div id="mfe1-root" ref={setContainer}>
+      <PortalContainerProvider container={container}>
+        <BrowserRouter>
+          <MainAppRoutes />
+        </BrowserRouter>
+      </PortalContainerProvider>
+    </div>
   );
-};
+}
 
 export default App;

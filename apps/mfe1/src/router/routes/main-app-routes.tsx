@@ -4,11 +4,11 @@ import { withLazyLoading, withLazyLoadingPermission } from "../router-helper";
 import type { IPermission } from "@/types";
 
 const TaskManagement = lazy(() => import("@/pages/TaskManagement"));
-const App = lazy(() => import("@/App"));
+const Home = lazy(() => import("@/pages/Home"));
 const AppLayout = lazy(() => import("@/components/layouts/app-layout"));
 const NotFound = lazy(() => import("@/components/common/templates/NotFound"));
 const NotHavePermission = lazy(
-  () => import("@/components/common/templates/NotHavePermission"),
+  () => import("@/components/common/templates/NotHavePermission")
 );
 
 export const MainAppRoutes = () => {
@@ -39,7 +39,7 @@ export const MainAppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={withLazyLoading(AppLayout)}>
-        <Route index element={withLazyLoading(App)} />
+        <Route index element={withLazyLoading(Home)} />
         {microAppRoutes}
         <Route
           path="not-have-permission"

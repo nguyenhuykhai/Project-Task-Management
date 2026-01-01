@@ -10,7 +10,7 @@ import { useEventFilters } from "./hooks/useEventFilters";
 import { MAX_LOGS } from "./constants";
 
 export const EventDebugger: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
