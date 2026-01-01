@@ -24,16 +24,15 @@ Before deploying, ensure:
 
 ### **Step 2: Framework & Build Settings**
 
-| Setting              | Value                                         |
-| -------------------- | --------------------------------------------- |
-| **Framework Preset** | Other                                         |
-| **Root Directory**   | `apps/mfe2`                                   |
-| **Build Command**    | `cd ../.. && pnpm install && pnpm build:mfe2` |
-| **Output Directory** | `apps/mfe2/dist`                              |
-| **Install Command**  | `pnpm install`                                |
+> **✨ Note:** Most settings are now configured in [`apps/mfe2/vercel.json`](file:///d:/Work/Hopper/micro-fe-skeleton/apps/mfe2/vercel.json). You only need to set the **Root Directory** in the Dashboard.
 
-> **💡 Why this build command?**  
-> We navigate to the monorepo root (`cd ../..`) to ensure `pnpm` can resolve workspace dependencies (`@repo/core`, `@repo/ui`), then run the filtered build command.
+| Setting              | Value                                    |
+| -------------------- | ---------------------------------------- |
+| **Framework Preset** | Other _(auto-detected from vercel.json)_ |
+| **Root Directory**   | `apps/mfe2` ⚠️ **Set this manually**     |
+| **Build Command**    | _(Configured in vercel.json)_            |
+| **Output Directory** | _(Configured in vercel.json)_            |
+| **Install Command**  | _(Configured in vercel.json)_            |
 
 ### **Step 3: Environment Variables**
 
@@ -59,13 +58,15 @@ After deployment, **copy the production URL** (e.g., `https://mfe2-xyz123.vercel
 
 ### **Step 2: Framework & Build Settings**
 
-| Setting              | Value                                         |
-| -------------------- | --------------------------------------------- |
-| **Framework Preset** | Other                                         |
-| **Root Directory**   | `apps/mfe1`                                   |
-| **Build Command**    | `cd ../.. && pnpm install && pnpm build:mfe1` |
-| **Output Directory** | `apps/mfe1/dist`                              |
-| **Install Command**  | `pnpm install`                                |
+> **✨ Note:** Most settings are now configured in [`apps/mfe1/vercel.json`](file:///d:/Work/Hopper/micro-fe-skeleton/apps/mfe1/vercel.json). You only need to set the **Root Directory** in the Dashboard.
+
+| Setting              | Value                                    |
+| -------------------- | ---------------------------------------- |
+| **Framework Preset** | Other _(auto-detected from vercel.json)_ |
+| **Root Directory**   | `apps/mfe1` ⚠️ **Set this manually**     |
+| **Build Command**    | _(Configured in vercel.json)_            |
+| **Output Directory** | _(Configured in vercel.json)_            |
+| **Install Command**  | _(Configured in vercel.json)_            |
 
 ### **Step 3: Environment Variables**
 
@@ -119,6 +120,35 @@ After both deployments are complete:
 ---
 
 ## 🚨 Common Issues & Fixes
+
+### **Issue 0: pnpm Install Fails with ERR_INVALID_THIS** ⚠️ **CRITICAL**
+
+**Error:** `GET https://registry.npmjs.org/... error (ERR_INVALID_THIS). Will retry in X seconds.`
+
+**Root Cause:**  
+This occurs due to Node.js version incompatibility or pnpm network issues in Vercel's CI environment.
+
+**Fix Applied (Already Implemented):**
+We've implemented a **three-part solution**:
+
+1. **`.node-version` file** (root directory) → Forces Vercel to use Node.js 20.x
+2. **Updated `.npmrc`** → Added network timeout and retry configurations:
+   ```
+   network-timeout=300000
+   fetch-retries=5
+   fetch-retry-mintimeout=10000
+   fetch-retry-maxtimeout=60000
+   ```
+3. **Updated `vercel.json` files** → Modified to use:
+   - `installCommand: "pnpm install --no-frozen-lockfile"`
+   - Corrected `outputDirectory` paths (`apps/mfe1/dist`, `apps/mfe2/dist`)
+
+**Verification:**
+
+- ✅ Commit all changes (`.node-version`, `.npmrc`, both `vercel.json` files)
+- ✅ Push to repository
+- ✅ Trigger new deployment in Vercel
+- ✅ Check build logs for successful `pnpm install`
 
 ### **Issue 1: CORS Error on `remoteEntry.js`**
 

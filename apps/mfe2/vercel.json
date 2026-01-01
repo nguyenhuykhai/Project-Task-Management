@@ -1,6 +1,8 @@
 {
-  "buildCommand": "pnpm build:mfe2",
-  "outputDirectory": "dist",
+  "framework": null,
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm install --no-frozen-lockfile && pnpm build:mfe2",
+  "outputDirectory": "apps/mfe2/dist",
   "headers": [
     {
       "source": "/(.*)",
