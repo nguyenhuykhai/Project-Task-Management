@@ -23,7 +23,7 @@ export function SidebarToggle({ isOpen, setIsOpen }: SidebarToggleProps) {
       >
         <ChevronLeft
           className={cn(
-            "h-4 w-4 transition-transform ease-in-out duration-700 text-foreground",
+            "h-4 w-4 transition-transform ease-in-out duration-700 text-foreground dark:text-gray-100",
             isOpen === false ? "rotate-180" : "rotate-0"
           )}
         />

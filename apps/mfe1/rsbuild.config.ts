@@ -9,6 +9,10 @@ const buildRemotes = () => {
   const mfe2Scope = process.env.VITE_MFE2_SCOPE || "remote";
   remotes[mfe2Scope] = `${mfe2Scope}@${mfe2Url}`;
 
+  // Add docs app remote
+  const docsUrl = process.env.VITE_DOCS_BASE_URL || "http://localhost:3003";
+  remotes["docs_app"] = `docs_app@${docsUrl}/remoteEntry.js`;
+
   return remotes;
 };
 

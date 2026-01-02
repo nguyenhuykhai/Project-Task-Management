@@ -5,6 +5,7 @@ import type { IPermission } from "@/types";
 
 const TaskManagement = lazy(() => import("@/pages/TaskManagement"));
 const Home = lazy(() => import("@/pages/Home"));
+const DocsPage = lazy(() => import("@/pages/DocsPage"));
 const AppLayout = lazy(() => import("@/components/layouts/app-layout"));
 const NotFound = lazy(() => import("@/components/common/templates/NotFound"));
 const NotHavePermission = lazy(
@@ -22,6 +23,12 @@ export const MainAppRoutes = () => {
       key: "task-management",
       path: "task-management/*",
       component: TaskManagement,
+      permission: true,
+    },
+    {
+      key: "docs",
+      path: "docs/*",
+      component: DocsPage,
       permission: true,
     },
   ];

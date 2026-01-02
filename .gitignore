@@ -34,6 +34,10 @@ build/
 !.env.example
 !.env.development
 
+# Generated files
+.docusaurus
+.cache-loader
+
 # Logs & debug
 *.log
 *.log*
