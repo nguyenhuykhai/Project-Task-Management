@@ -10,9 +10,7 @@ export function ContentLayout({ title, children }: ContentLayoutProps) {
     <div className="w-full">
       <Navbar title={title} />
       {/* Updated: Ensure container has correct text color */}
-      <div className="container pt-8 pb-8 px-4 sm:px-8 text-foreground">
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 }
