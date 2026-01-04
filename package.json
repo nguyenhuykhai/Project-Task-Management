@@ -8,6 +8,9 @@
     "dev": "pnpm --parallel --filter \"@repo/*\" dev",
     "dev:mfe1": "pnpm --filter @repo/mfe1 dev",
     "dev:mfe2": "pnpm --filter @repo/mfe2 dev",
+    "dev:docs": "pnpm --filter @repo/docs dev",
+    "predev": "pnpm stop",
+    "stop": "kill-port 3000 3001 3002",
     "preview": "pnpm --parallel --filter \"@repo/*\" preview",
     "build": "pnpm --recursive --filter \"@repo/*\" build",
     "build:mfe1": "pnpm --filter @repo/mfe1 build",
@@ -20,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "kill-port": "^2.0.1",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   },

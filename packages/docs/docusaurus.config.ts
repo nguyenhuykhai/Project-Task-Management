@@ -16,7 +16,7 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: process.env.DOCUSAURUS_URL || "http://localhost:3003",
+  url: process.env.DOCUSAURUS_URL || "http://localhost:3000",
   // Set the /<baseUrl>/ pathname under which your site is served
   // Use "/" for standalone dev, "/docs" when consumed by MFE
   baseUrl: process.env.DOCUSAURUS_BASE_URL || "/",

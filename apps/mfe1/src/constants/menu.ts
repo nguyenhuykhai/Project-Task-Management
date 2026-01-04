@@ -1,5 +1,5 @@
 import type { Group } from "@/types/menus";
-import { House, LayoutList, ShieldX } from "lucide-react";
+import { Book, House, LayoutList, ShieldX } from "lucide-react";
 
 export const getMenuList = (pathname: string): Group[] => {
   return [
@@ -18,6 +18,13 @@ export const getMenuList = (pathname: string): Group[] => {
           label: "Not Have Permission",
           icon: ShieldX,
           active: pathname === "/not-have-permission",
+          submenus: [],
+        },
+        {
+          href: "/docs",
+          label: "Documentation",
+          icon: Book,
+          active: pathname === "/docs",
           submenus: [],
         },
       ],

@@ -9,7 +9,7 @@ cd packages/docs
 pnpm dev
 ```
 
-Access at: `http://localhost:3003/`
+Access at: `http://localhost:3000/`
 
 ### For Module Federation Mode (Consumed by mfe1)
 
@@ -18,7 +18,7 @@ cd packages/docs
 pnpm start
 ```
 
-Access at: `http://localhost:3003/docs/` or via mfe1 at `http://localhost:3001/docs`
+Access at: `http://localhost:3000/docs/` or via mfe1 at `http://localhost:3001/docs`
 
 ## Why Two Modes?
 

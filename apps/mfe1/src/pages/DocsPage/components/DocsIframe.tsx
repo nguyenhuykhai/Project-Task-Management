@@ -5,16 +5,16 @@ interface DocsIframeProps {
   currentTheme: Theme;
 }
 
+const DOCS_BASE_URL =
+  import.meta.env.VITE_DOCS_BASE_URL || "http://localhost:3000";
+
 export const DocsIframe: React.FC<DocsIframeProps> = ({ currentTheme }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Helper function to send message
   const sendThemeToIframe = (theme: string) => {
     if (iframeRef.current && iframeRef.current.contentWindow) {
-      iframeRef.current.contentWindow.postMessage(
-        { theme },
-        "http://localhost:3003"
-      );
+      iframeRef.current.contentWindow.postMessage({ theme }, DOCS_BASE_URL);
     }
   };
 
@@ -32,7 +32,7 @@ export const DocsIframe: React.FC<DocsIframeProps> = ({ currentTheme }) => {
     <div style={{ width: "100%", height: "calc(100vh - 60px)" }}>
       <iframe
         ref={iframeRef}
-        src="http://localhost:3003/intro"
+        src={`${DOCS_BASE_URL}/intro`}
         title="Documentation"
         width="100%"
         height="100%"

@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "dev": "docusaurus start --port 3003",
-    "start": "cross-env DOCUSAURUS_BASE_URL=/ docusaurus start --port 3003",
+    "dev": "docusaurus start",
+    "start": "docusaurus start",
     "build": "cross-env DOCUSAURUS_BASE_URL=/ docusaurus build",
     "build:standalone": "docusaurus build",
     "swizzle": "docusaurus swizzle",
