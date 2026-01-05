@@ -18,7 +18,7 @@ const AppLayout = ({ children }: { children?: ReactNode }) => {
 
         <div className="h-screen">
           <AdminPanelLayout>
-            <ContentLayout title="Project Task Management">
+            <ContentLayout title="Micro Frontend Skeleton">
               {children ? <>{children}</> : <Outlet />}
             </ContentLayout>
           </AdminPanelLayout>

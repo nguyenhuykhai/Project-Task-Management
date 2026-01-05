@@ -102,7 +102,7 @@ const NotHavePermission: React.FC = () => {
             <span>4 0 3</span>
           </span>
           <span className="text-gray-500 text-xl">
-            You do not have permission to access this page!
+            Bạn không có quyền truy cập trang này!
           </span>
         </div>
 
@@ -112,7 +112,7 @@ const NotHavePermission: React.FC = () => {
             href="/"
             className="text-gray-500 font-mono text-xl bg-gray-200 p-3 rounded-md hover:shadow-md inline-block transition-shadow"
           >
-            Go back
+            Quay lại trang chủ
           </a>
         </div>
       </div>

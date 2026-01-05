@@ -5,22 +5,22 @@ import { Button } from "@repo/ui";
 const RemoteButton: React.FC = () => {
   const triggerSuccess = () => {
     publishEvent("notification:show", {
-      title: "Success! 🎉",
-      message: "Data synced from Remote MFE2 successfully.",
+      title: "Thông báo! 🎉",
+      message: "Tạo thông báo thành công",
       type: "success",
       duration: 3000,
     });
   };
 
   return (
-    <div className="group rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
+    <div className="group rounded-lg border bg-card p-6 m-6 shadow-sm transition-all hover:shadow-md hover:border-primary/20">
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-xl font-semibold tracking-tight mb-1">
-            Remote Component
+            Xin chào đây là component từ Remote App
           </h2>
           <p className="text-sm text-muted-foreground">
-            Mounted from MFE2 via Module Federation
+            Thông qua Module Federation
           </p>
         </div>
 
@@ -28,7 +28,7 @@ const RemoteButton: React.FC = () => {
           onClick={triggerSuccess}
           className="w-full sm:w-auto transition-transform active:scale-95"
         >
-          Dispatch Event to Host
+          Tạo thông báo
         </Button>
 
         <div className="flex items-center gap-2 text-xs font-medium text-green-600 dark:text-green-500 bg-green-50 dark:bg-green-900/10 px-3 py-2 rounded-full w-fit">
@@ -36,7 +36,7 @@ const RemoteButton: React.FC = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
           </span>
-          Service Connected
+          Kết nối thành công
         </div>
       </div>
     </div>

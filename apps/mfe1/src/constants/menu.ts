@@ -8,21 +8,21 @@ export const getMenuList = (pathname: string): Group[] => {
       menus: [
         {
           href: "/",
-          label: "Home",
+          label: "Trang chủ",
           icon: House,
           active: pathname === "/",
           submenus: [],
         },
         {
           href: "/not-have-permission",
-          label: "Not Have Permission",
+          label: "Không có quyền",
           icon: ShieldX,
           active: pathname === "/not-have-permission",
           submenus: [],
         },
         {
           href: "/docs",
-          label: "Documentation",
+          label: "Tài liệu",
           icon: Book,
           active: pathname === "/docs",
           submenus: [],
@@ -34,7 +34,7 @@ export const getMenuList = (pathname: string): Group[] => {
       menus: [
         {
           href: "/task-management",
-          label: "Task Management",
+          label: "Quản lý nhiệm vụ",
           icon: LayoutList,
           active: pathname === "/task-management",
           // Add submenus if needed

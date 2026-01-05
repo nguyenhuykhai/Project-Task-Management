@@ -33,7 +33,7 @@ export function SheetMenu() {
             <Link to="/dashboard" className="flex items-center">
               <PanelsTopLeft className="w-6 h-6 mr-1 text-primary" />
               <SheetTitle className="font-bold text-lg text-foreground">
-                Brand
+                Micro Frontend
               </SheetTitle>
             </Link>
           </Button>

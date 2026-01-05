@@ -47,7 +47,7 @@ export function Sidebar() {
                   : "translate-x-0 opacity-100"
               )}
             >
-              PTMG
+              Micro Frontend
             </h1>
           </Link>
         </Button>
