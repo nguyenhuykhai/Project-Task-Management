@@ -72,17 +72,17 @@ pnpm --version
 
 ## Clone the Repository
 
-Clone the project from your Git repository:
+Clone the project from Git repository:
 
 ```bash
 # HTTPS
-git clone https://github.com/your-username/micro-fe-skeleton.git
+git clone https://github.com/nguyenhuykhai/Micro-Frontend-Skeleton.git
 
 # OR SSH
-git clone git@github.com:your-username/micro-fe-skeleton.git
+git clone git@github.com:nguyenhuykhai/Micro-Frontend-Skeleton.git
 
 # Navigate to the project
-cd micro-fe-skeleton
+cd Micro-Frontend-Skeleton
 ```
 
 ## Install Dependencies

@@ -63,12 +63,6 @@ graph LR
 - **Shared Context**: Manages global state and provides context to remote applications
 - **Entry Point**: Serves as the primary entry point for end users
 
-### Exposes
-
-| Export Name  | Component Path                               | Purpose                  |
-| ------------ | -------------------------------------------- | ------------------------ |
-| `./NotFound` | `./src/components/common/templates/NotFound` | 404 error page component |
-
 ### Consumes
 
 - **Remote components** from `mfe2` (configured via `VITE_MFE2_BASE_URL`)
@@ -80,9 +74,6 @@ graph LR
   name: "host",
   remotes: {
     remote: "remote@http://localhost:3002/remoteEntry.js"
-  },
-  exposes: {
-    "./NotFound": "./src/components/common/templates/NotFound"
   }
 }
 ```

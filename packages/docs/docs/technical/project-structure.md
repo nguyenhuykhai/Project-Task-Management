@@ -168,27 +168,6 @@ apps/mfe2/
 └── package.json                # Dependencies & scripts
 ```
 
-#### Consuming Host Components
-
-mfe2 can import components from mfe1 using TypeScript declarations:
-
-```typescript title="apps/mfe2/src/types/host.d.ts"
-declare module "host/NotFound" {
-  const NotFound: React.ComponentType;
-  export default NotFound;
-}
-```
-
-Usage:
-
-```typescript
-import NotFound from "host/NotFound";
-
-function ErrorPage() {
-  return <NotFound />;
-}
-```
-
 ## Shared Packages Structure
 
 ### @repo/core
@@ -366,9 +345,6 @@ export default defineConfig({
       remotes: {
         remote: "remote@http://localhost:3002/remoteEntry.js",
       },
-      exposes: {
-        "./NotFound": "./src/components/common/templates/NotFound",
-      },
       shared: {
         react: { singleton: true, requiredVersion: false },
         "react-dom": { singleton: true, requiredVersion: false },
@@ -425,15 +401,14 @@ export default defineConfig({
 graph TD
     MFE1[mfe1 Application]
     MFE2[mfe2 Application]
-    CORE[@repo/core]
-    UI[@repo/ui]
+    CORE["@repo/core"]
+    UI["@repo/ui"]
 
     MFE1 --> CORE
     MFE1 --> UI
     MFE2 --> CORE
     MFE2 --> UI
     MFE1 -.->|consumes| MFE2
-    MFE2 -.->|consumes| MFE1
 
     style MFE1 fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
     style MFE2 fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff

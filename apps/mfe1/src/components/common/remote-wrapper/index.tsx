@@ -1,5 +1,4 @@
 export const ErrorFallback = ({ error }: { error: any }) => {
-  console.log("🚀 ~ ErrorFallback ~ error:", error);
   return (
     <div className="bg-gray-100 h-screen flex w-full justify-center items-center">
       <div className="text-center mt-24 m-auto">

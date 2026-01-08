@@ -39,7 +39,6 @@ graph TB
     A[mfe1:3001 - Host] <--> B[mfe2:3002 - Remote]
     A --> |Consumes| B
     B --> |Exposes Button| A
-    A --> |Exposes NotFound| B
     A --> C
     A --> D
     B --> C

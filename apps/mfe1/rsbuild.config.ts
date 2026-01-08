@@ -36,9 +36,6 @@ export default defineConfig({
     pluginModuleFederation({
       name: "host",
       remotes: buildRemotes(),
-      exposes: {
-        "./NotFound": "./src/components/common/templates/NotFound",
-      },
       shared: {
         ...dependencies,
         react: {
