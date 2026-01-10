@@ -236,8 +236,6 @@ pnpm dev:mfe2
 
 - **Name:** `host`
 - **Port:** 3001
-- **Exposes:**
-  - `./NotFound` - 404 Not Found component
 - **Consumes:**
   - Remote components from mfe2
 
@@ -247,8 +245,6 @@ pnpm dev:mfe2
 - **Port:** 3002
 - **Exposes:**
   - `./Button` - Exportable Button component
-- **Consumes:**
-  - Host components from mfe1
 
 ## 🛠️ Available Scripts
 
