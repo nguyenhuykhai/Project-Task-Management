@@ -20,7 +20,7 @@ export default defineConfig({
     pluginModuleFederation({
       name: "remote",
       exposes: {
-        "./Button": "./src/components/export-app",
+        "./RemoteApp": "./src/apps/main-app",
       },
       filename: "remoteEntry.js",
       shared: {

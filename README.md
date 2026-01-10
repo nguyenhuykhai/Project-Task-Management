@@ -23,13 +23,17 @@ graph TB
     A[mfe1:3001 - Host] <--> B[mfe2:3002 - Remote]
     A --> |Consumes| B
     B --> |Exposes Button| A
-    A --> |Exposes NotFound| B
     A --> C
     A --> D
     B --> C
     B --> D
     C["@repo/core:<br/>Event Bus, Services, Hooks"]
     D["@repo/ui:<br/>Components, Tailwind"]
+
+    style A fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
+    style B fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style C fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style D fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
 ```
 
 ## 📁 Monorepo Structure

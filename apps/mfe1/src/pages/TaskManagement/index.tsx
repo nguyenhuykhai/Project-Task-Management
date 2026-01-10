@@ -4,7 +4,7 @@ import { createRemoteAppComponent } from "@module-federation/bridge-react";
 import { loadRemote } from "@module-federation/runtime";
 
 const TaskManagement = createRemoteAppComponent({
-  loader: () => loadRemote("remote/Button"),
+  loader: () => loadRemote("remote/RemoteApp"),
   loading: <LoaderTwo />,
   fallback: (error: any) => <ErrorFallback error={error} />,
 });

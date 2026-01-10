@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { AppProvider } from "./components/layouts/app-provider";
+import AppProvider from "./components/layouts/app-provider";
 
 const mount = (el: HTMLElement) => {
   const root = ReactDOM.createRoot(el);
